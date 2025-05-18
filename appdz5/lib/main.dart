@@ -32,7 +32,7 @@ void main() async {
 
   bool loggedIn = false;
   await prefs.setString('username', username);
-  await prefs.setBool('isLoggedIn', true);
+  //await prefs.setBool('isLoggedIn', true);
 
   if (username.isNotEmpty) {
     final doc = await FirebaseFirestore.instance

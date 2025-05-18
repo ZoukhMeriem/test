@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // <-- import localisation
 import 'package:dialog_flowtter/dialog_flowtter.dart' as df;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -51,18 +50,18 @@ class _TrainbotChatScreenState extends State<TrainbotChatScreen> {
   }
 
   Future<void> initDialogFlowtter() async {
-    debugPrint("🔄 ${AppLocalizations.of(context)?.initializingDialogflow ?? 'Initialisation de Dialogflow...'}");
+    debugPrint("🔄 Initialisation de Dialogflow...");
     try {
       final instance = await df.DialogFlowtter.fromFile(
         path: 'assets/dialogflow-auth.json',
       );
-      debugPrint("✅ ${AppLocalizations.of(context)?.dialogflowInitialized ?? 'Dialogflow initialisé !'}");
+      debugPrint("✅ Dialogflow initialisé !");
       setState(() {
         dialogFlowtter = instance;
         isReady = true;
       });
     } catch (e) {
-      debugPrint("❌ ${AppLocalizations.of(context)?.dialogflowInitError ?? 'Erreur d\'initialisation Dialogflow:'} $e");
+      debugPrint("❌ Erreur d'initialisation Dialogflow: $e");
     }
   }
 
@@ -88,7 +87,7 @@ class _TrainbotChatScreenState extends State<TrainbotChatScreen> {
         queryInput: df.QueryInput(text: df.TextInput(text: userMessage)),
       );
 
-      String botResponse = AppLocalizations.of(context)?.defaultBotResponse ?? "Désolée, je n'ai pas compris.";
+      String botResponse = "Désolée, je n'ai pas compris.";
       if (response.message != null &&
           response.message!.text != null &&
           response.message!.text!.text!.isNotEmpty) {
@@ -112,7 +111,7 @@ class _TrainbotChatScreenState extends State<TrainbotChatScreen> {
         curve: Curves.easeOut,
       );
     } catch (e) {
-      debugPrint("❌ ${AppLocalizations.of(context)?.dialogflowError ?? 'Erreur avec Dialogflow :'} $e");
+      debugPrint("❌ Erreur avec Dialogflow : $e");
     }
   }
 
@@ -130,7 +129,7 @@ class _TrainbotChatScreenState extends State<TrainbotChatScreen> {
         var messages = snapshot.data!.docs;
         if (messages.isEmpty) {
           return Center(
-            child: Text(AppLocalizations.of(context)!.noMessagesYet,
+            child: Text("Aucun message pour l'instant",
                 style: TextStyle(fontSize: 16, color: Colors.grey)),
           );
         }
@@ -161,7 +160,7 @@ class _TrainbotChatScreenState extends State<TrainbotChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.trainBot),
+        title: Text("TrainBot"),
         backgroundColor: Color(0x998BB1FF),
       ),
       body: Stack(
@@ -182,7 +181,7 @@ class _TrainbotChatScreenState extends State<TrainbotChatScreen> {
                         controller: _controller,
                         style: TextStyle(color: Colors.black),
                         decoration: InputDecoration(
-                          hintText: AppLocalizations.of(context)!.writeMessageHint,
+                          hintText: "Écrire un message...",
                           hintStyle: TextStyle(color: Colors.black54),
                           filled: true,
                           fillColor: Colors.white.withOpacity(0.85),
@@ -200,7 +199,6 @@ class _TrainbotChatScreenState extends State<TrainbotChatScreen> {
                       child: IconButton(
                         icon: Icon(Icons.send, color: Colors.white),
                         onPressed: _sendMessage,
-                        tooltip: AppLocalizations.of(context)!.send,
                       ),
                     ),
                   ],

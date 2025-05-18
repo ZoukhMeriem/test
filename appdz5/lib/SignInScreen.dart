@@ -63,11 +63,29 @@ class _SignInScreenState extends State<SignInScreen> {
         {
           "type": "text/html",
           "value": """
-          <h2>Bienvenue sur DzTrain 🚄 !</h2>
-          <p>Merci d'avoir rejoint notre communauté.</p>
-          <p>Nous sommes ravis de vous avoir parmi nous !</p>
-          <p>Bon voyage avec DzTrain ! 🚂</p>
-        """
+  <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+    <h2 style="color: #1976d2;">Bienvenue à bord de DzTrain 🚆</h2>
+    <p>Bonjour,</p>
+    <p>Merci de vous être inscrit sur <strong>DzTrain</strong> — votre compagnon pour voyager intelligemment à travers le réseau ferroviaire algérien.</p>
+    <p>Avec notre application, vous pouvez :</p>
+    <ul>
+      <li>Rechercher des trajets et visualiser les horaires</li>
+      <li>Suivre les trains en temps réel</li>
+      <li>Recevoir des notifications sur les retards et annulations</li>
+      <li>Discuter avec d'autres voyageurs</li>
+    </ul>
+    <p>Nous sommes ravis de vous compter parmi nous !</p>
+    <p>
+      👉 <a href="https://dztrain.com" style="color: #1976d2;">Découvrir l’application DzTrain</a>
+    </p>
+    <hr style="border: none; border-top: 1px solid #ccc;">
+    <p style="font-size: 12px; color: #888;">
+      Cet e-mail vous a été envoyé suite à votre inscription sur DzTrain.<br>
+      Si vous pensez avoir reçu ce message par erreur, veuillez l’ignorer ou contacter notre support.
+    </p>
+  </div>
+"""
+
         }
       ]
     };

@@ -20,7 +20,9 @@
   "@generalError": {
     "description": "Message d'erreur générique avec insertion de l'erreur",
     "placeholders": {
-      "error": {}
+      "error": {
+            "type": "Object"
+          }
     }
   },
 

@@ -22,6 +22,7 @@ class _LostObjectFormScreenState extends State<LostObjectFormScreen> {
   final TextEditingController _trainNumberController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   File? _image;
+  String _twoDigits(int n) => n.toString().padLeft(2, '0');
 
   Future<void> _pickImage() async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -45,6 +46,23 @@ class _LostObjectFormScreenState extends State<LostObjectFormScreen> {
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
+      try {
+        final selectedDate = DateTime.parse(_dateController.text);
+        final now = DateTime.now();
+
+        if (selectedDate.isAfter(now)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("❌ La date ne peut pas être dans le futur.")),
+          );
+          return;
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("❌ Date invalide.")),
+        );
+        return;
+      }
+
       String? imageUrl;
       if (_image != null) {
         imageUrl = await _uploadImage(_image!);
@@ -66,6 +84,7 @@ class _LostObjectFormScreenState extends State<LostObjectFormScreen> {
       Navigator.pop(context);
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -93,8 +112,10 @@ class _LostObjectFormScreenState extends State<LostObjectFormScreen> {
 
               TextFormField(
                 controller: _dateController,
+                style: TextStyle(color: Colors.black), // Pour affichage en noir
                 decoration: InputDecoration(
                   labelText: loc.lostObjectForm_dateLabel,
+                  labelStyle: TextStyle(color: Colors.black),
                   prefixIcon: Icon(Icons.calendar_today, color: Colors.black87),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                 ),
@@ -106,11 +127,30 @@ class _LostObjectFormScreenState extends State<LostObjectFormScreen> {
                     firstDate: DateTime(2022),
                     lastDate: DateTime(2030),
                   );
+
                   if (pickedDate != null) {
-                    _dateController.text = pickedDate.toString().split(" ")[0];
+                    TimeOfDay? pickedTime = await showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay.now(),
+                    );
+
+                    if (pickedTime != null) {
+                      final DateTime fullDateTime = DateTime(
+                        pickedDate.year,
+                        pickedDate.month,
+                        pickedDate.day,
+                        pickedTime.hour,
+                        pickedTime.minute,
+                      );
+
+                      _dateController.text =
+                      "${fullDateTime.year}-${_twoDigits(fullDateTime.month)}-${_twoDigits(fullDateTime.day)} "
+                          "${_twoDigits(fullDateTime.hour)}:${_twoDigits(fullDateTime.minute)}";
+                    }
                   }
                 },
               ),
+
 
               SizedBox(height: 20),
 
@@ -172,8 +212,10 @@ class _LostObjectFormScreenState extends State<LostObjectFormScreen> {
     final loc = AppLocalizations.of(context)!;
     return TextFormField(
       controller: controller,
+      style: TextStyle(color: Colors.black),
       decoration: InputDecoration(
         labelText: label,
+        labelStyle: TextStyle(color: Colors.black), // ✅ label en noir
         prefixIcon: Icon(icon, color: Colors.black87),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),

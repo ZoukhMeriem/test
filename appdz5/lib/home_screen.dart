@@ -690,9 +690,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         onChanged: (query) {
                           setModalState(() {
-                            _filteredDepartureStations = _stations.keys
+                            _filteredDestinationStations = _stations.keys
                                 .where((name) => name.toLowerCase().contains(query.toLowerCase()))
                                 .toList();
+
                           });
                         },
                       ),

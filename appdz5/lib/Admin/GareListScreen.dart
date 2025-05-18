@@ -127,6 +127,7 @@ class _GareManagementScreenState extends State<GareManagementScreen> {
 
               TextField(
                 controller: nameController,
+                style: TextStyle(color: Colors.black),
                 decoration: const InputDecoration(
                   labelText: 'Nom de la gare',
                   prefixIcon: Icon(Icons.train),
@@ -136,6 +137,7 @@ class _GareManagementScreenState extends State<GareManagementScreen> {
 
               TextField(
                 controller: _latController,
+                style: TextStyle(color: Colors.black),
                 decoration: const InputDecoration(
                   labelText: 'Latitude',
                   prefixIcon: Icon(Icons.location_on),
@@ -146,6 +148,7 @@ class _GareManagementScreenState extends State<GareManagementScreen> {
 
               TextField(
                 controller: _lngController,
+                style: TextStyle(color: Colors.black),
                 decoration: const InputDecoration(
                   labelText: 'Longitude',
                   prefixIcon: Icon(Icons.location_on_outlined),
@@ -266,6 +269,7 @@ class _GareManagementScreenState extends State<GareManagementScreen> {
               SizedBox(height: 20),
               TextField(
                 controller: nameController,
+                style: TextStyle(color: Colors.black),
                 decoration: InputDecoration(
                   labelText: 'Nom',
                   border: OutlineInputBorder(
@@ -277,6 +281,7 @@ class _GareManagementScreenState extends State<GareManagementScreen> {
               SizedBox(height: 12),
               TextField(
                 controller: _latController,
+                style: TextStyle(color: Colors.black),
                 decoration: InputDecoration(
                   labelText: 'Latitude',
                   border: OutlineInputBorder(
@@ -289,6 +294,7 @@ class _GareManagementScreenState extends State<GareManagementScreen> {
               SizedBox(height: 12),
               TextField(
                 controller: _lngController,
+                style: TextStyle(color: Colors.black),
                 decoration: InputDecoration(
                   labelText: 'Longitude',
                   border: OutlineInputBorder(
@@ -388,6 +394,7 @@ class _GareManagementScreenState extends State<GareManagementScreen> {
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               controller: _searchController,
+              style: TextStyle(color: Colors.black),
               decoration: const InputDecoration(
                 labelText: 'Rechercher une gare',
                 prefixIcon: Icon(Icons.search),

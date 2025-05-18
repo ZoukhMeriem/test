@@ -18,7 +18,7 @@ class _AdminLostObjectsScreenState extends State<AdminLostObjectsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Gestion des Objets Perdus", style: TextStyle(color: Colors.white)),
-        backgroundColor: Color(0xFF353C67),
+        backgroundColor: Color(0xBFABDFFF),
       ),
       body: Column(
         children: [
@@ -26,10 +26,14 @@ class _AdminLostObjectsScreenState extends State<AdminLostObjectsScreen> {
           Padding(
             padding: const EdgeInsets.all(12.0),
             child: TextField(
+              style: TextStyle(color: Colors.black), // ✅ Texte tapé en noir
               decoration: InputDecoration(
                 hintText: "Rechercher un objet...",
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                hintStyle: TextStyle(color: Colors.grey), // ✅ Texte d'indice en gris
+                prefixIcon: Icon(Icons.search, color: Colors.black), // ✅ Icône noire si souhaité
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               onChanged: (value) {
                 setState(() {
@@ -38,6 +42,7 @@ class _AdminLostObjectsScreenState extends State<AdminLostObjectsScreen> {
               },
             ),
           ),
+
           // Liste des objets
           Expanded(
             child: StreamBuilder<QuerySnapshot>(

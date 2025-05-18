@@ -26,10 +26,12 @@ class _UserListScreenState extends State<UserListScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
+              style: TextStyle(color: Colors.black), // ✅ Texte saisi en noir
               decoration: InputDecoration(
                 hintText: 'Rechercher par username...',
+                hintStyle: TextStyle(color: Colors.grey), // ✅ Placeholder en gris
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                prefixIcon: Icon(Icons.search),
+                prefixIcon: Icon(Icons.search, color: Colors.black), // ✅ Icône noire
               ),
               onChanged: (value) {
                 setState(() {
@@ -38,6 +40,7 @@ class _UserListScreenState extends State<UserListScreen> {
               },
             ),
           ),
+
 
           // 👥 Liste utilisateurs
           Expanded(

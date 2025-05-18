@@ -103,13 +103,14 @@ class _HoraireTrainPageState extends State<HoraireTrainPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(loc.appTitle),
-        backgroundColor: Colors.indigo,
+        backgroundColor: Color(0xFE888111),
       ),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
+              style: TextStyle(color: Colors.black),
               decoration: InputDecoration(
                 labelText: loc.search,
                 prefixIcon: Icon(Icons.search),
@@ -135,6 +136,7 @@ class _HoraireTrainPageState extends State<HoraireTrainPage> {
               ),
               DropdownButton<String>(
                 value: selectedSortOrder,
+                style: TextStyle(color: Colors.black),
                 items: [
                   DropdownMenuItem(
                     value: 'asc',
@@ -152,6 +154,7 @@ class _HoraireTrainPageState extends State<HoraireTrainPage> {
                 },
               ),
               DropdownButton<String>(
+                style: TextStyle(color: Colors.black),
                 value: selectedSortBy,
                 items: [
                   DropdownMenuItem(
@@ -233,7 +236,9 @@ class _HoraireTrainPageState extends State<HoraireTrainPage> {
                   margin: EdgeInsets.all(8.0),
                   child: ListTile(
                     title: Text(
-                        '${loc.departure}: ${horaire['depart']} - ${loc.stop}: ${horaire['arret']}'),
+                        '${loc.departure}: ${horaire['depart']} - ${loc.stop}: ${horaire['arret']}'
+                        ,style: TextStyle(color: Colors.black),
+                  ),
                     subtitle: Text(
                         '${loc.arrivalTime}: ${horaire['heure_arrivee']}, ${loc.departureTime}: ${horaire['heure_depart']}'),
                     trailing: Column(

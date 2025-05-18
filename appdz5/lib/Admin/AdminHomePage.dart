@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dztrainfay/Admin/train_management_screen.dart';
 import 'AdminListScreen.dart';
+import 'AdminLostObjectsScreen.dart';
 import 'GareListScreen.dart';
 import 'LigneListScreen.dart';
 import 'UserListScreen.dart';
@@ -160,7 +161,7 @@ class AdminHomePage extends StatelessWidget {
                   ),
                   _buildMenuButton(
                     context: context,
-                    label: "Gérer les Utilisateurs",
+                    label: "Gérer les Voyageurs",
                     screen: UserListScreen(),
                     icon: Icons.people,
                     color: const Color(0xFF88A8BD),
@@ -185,6 +186,13 @@ class AdminHomePage extends StatelessWidget {
                     screen: StylishStatsScreen (),//StatistiquesScreen(),
                     icon: Icons.bar_chart,
                     color: const Color(0xFFB3A0F1),
+                  ),
+                  _buildMenuButton(
+                    context: context,
+                    label: "Objets Perdus",
+                    screen: AdminLostObjectsScreen(),
+                    icon: Icons.search, // ou Icons.backpack, Icons.inventory, selon le style voulu
+                    color: const Color(0xFFF4D9DE),
                   ),
                 ],
               ),

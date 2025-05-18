@@ -181,11 +181,14 @@ class _AddAdminScreenState extends State<AddAdminScreen> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         child: TextFormField(
+          style: TextStyle(color: Colors.black),
           controller: controller,
           obscureText: obscureText,
           decoration: InputDecoration(
             labelText: label,
             border: InputBorder.none,
+              labelStyle: TextStyle(color: Colors.black)
+
           ),
           validator: validator,
         ),

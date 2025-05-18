@@ -20,7 +20,9 @@
   "@generalError": {
     "description": "رسالة خطأ عامة تتضمن تفاصيل الخطأ",
     "placeholders": {
-      "error": {}
+       "error": {
+            "type": "Object"
+          }
     }
   },
 

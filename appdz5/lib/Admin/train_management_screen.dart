@@ -60,36 +60,46 @@ class _TrainManagementScreenState extends State<TrainManagementScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           train == null ? 'Ajouter un Train' : 'Modifier le Train',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black, // ✅ Titre en noir
+          ),
         ),
+
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: numController,
+                style: TextStyle(color: Colors.black), // ✅ Texte tapé en noir
                 decoration: InputDecoration(
                   labelText: 'Numéro du train',
-                  prefixIcon: Icon(Icons.train),
+                  labelStyle: TextStyle(color: Colors.black), // ✅ Label en noir
+                  prefixIcon: Icon(Icons.train, color: Colors.black),
                   border: OutlineInputBorder(),
                 ),
               ),
               SizedBox(height: 12),
               TextField(
                 controller: lineController,
+                style: TextStyle(color: Colors.black),
                 decoration: InputDecoration(
                   labelText: 'ID de la ligne',
-                  prefixIcon: Icon(Icons.line_weight),
+                  labelStyle: TextStyle(color: Colors.black),
+                  prefixIcon: Icon(Icons.line_weight, color: Colors.black),
                   border: OutlineInputBorder(),
                 ),
               ),
               SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 value: selectedStatus,
+                style: TextStyle(color: Colors.black), // ✅ Texte sélectionné en noir
+                dropdownColor: Colors.white,
                 items: statusOptions.map((status) {
                   return DropdownMenuItem(
                     value: status,
-                    child: Text(status),
+                    child: Text(status, style: TextStyle(color: Colors.black)), // ✅ Items en noir
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -99,16 +109,19 @@ class _TrainManagementScreenState extends State<TrainManagementScreen> {
                 },
                 decoration: InputDecoration(
                   labelText: 'Statut',
-                  prefixIcon: Icon(Icons.info),
+                  labelStyle: TextStyle(color: Colors.black),
+                  prefixIcon: Icon(Icons.info, color: Colors.black),
                   border: OutlineInputBorder(),
                 ),
               ),
               SizedBox(height: 12),
               TextField(
                 controller: latController,
+                style: TextStyle(color: Colors.black),
                 decoration: InputDecoration(
                   labelText: 'Latitude',
-                  prefixIcon: Icon(Icons.my_location),
+                  labelStyle: TextStyle(color: Colors.black),
+                  prefixIcon: Icon(Icons.my_location, color: Colors.black),
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
@@ -116,9 +129,11 @@ class _TrainManagementScreenState extends State<TrainManagementScreen> {
               SizedBox(height: 12),
               TextField(
                 controller: lngController,
+                style: TextStyle(color: Colors.black),
                 decoration: InputDecoration(
                   labelText: 'Longitude',
-                  prefixIcon: Icon(Icons.location_on),
+                  labelStyle: TextStyle(color: Colors.black),
+                  prefixIcon: Icon(Icons.location_on, color: Colors.black),
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.numberWithOptions(decimal: true),

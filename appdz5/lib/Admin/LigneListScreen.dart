@@ -48,6 +48,7 @@ class _LigneManagementScreenState extends State<LigneManagementScreen> {
               SizedBox(height: 20),
               TextField(
                 controller: nameController,
+                style: TextStyle(color: Colors.black),
                 decoration: InputDecoration(
                   labelText: "Nom",
                   border: OutlineInputBorder(),
@@ -57,6 +58,7 @@ class _LigneManagementScreenState extends State<LigneManagementScreen> {
               SizedBox(height: 15),
               TextField(
                 controller: codeController,
+                style: TextStyle(color: Colors.black),
                 decoration: InputDecoration(
                   labelText: "Code",
                   border: OutlineInputBorder(),
@@ -165,6 +167,7 @@ class _LigneManagementScreenState extends State<LigneManagementScreen> {
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               controller: _searchController,
+              style: TextStyle(color: Colors.black),
               decoration: InputDecoration(
                 labelText: "Rechercher une ligne",
                 prefixIcon: Icon(Icons.search),

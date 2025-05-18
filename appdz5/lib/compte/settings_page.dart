@@ -85,18 +85,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   subtitle: widget.selectedLanguage.toUpperCase(), onTap: () {
                     _showLanguageDialog(context);
                   }),
-              SwitchListTile(
-                secondary: Icon(Icons.dark_mode, color: Colors.black87),
-                title: Text(localizations.darkMode, style: const TextStyle(fontWeight: FontWeight.w500)),
-                value: isDarkMode,
-                activeColor: primaryColor,
-                onChanged: (value) async {
-                  setState(() => isDarkMode = value);
-                  final prefs = await SharedPreferences.getInstance();
-                  await prefs.setBool('isDark', value);
-                  widget.toggleTheme(value);
-                },
-              ),
+
+
               SwitchListTile(
                 secondary: Icon(Icons.notifications_active, color: Colors.black87),
                 title: Text(localizations.notifications, style: const TextStyle(fontWeight: FontWeight.w500)),

@@ -22,35 +22,7 @@ class _StylishStatsScreenState extends State<StylishStatsScreen> {
     fetchStats();
   }
 
-  /*Future<void> fetchStats() async {
-    final snapshot = await FirebaseFirestore.instance.collection('User').get();
 
-    int h = 0, f = 0;
-    int e = 0, emp = 0, c = 0;
-
-    for (var doc in snapshot.docs) {
-      final data = doc.data();
-      final sexe = data['sexe'];
-      final emploi = data['emploi'];
-
-      if (sexe == 'Homme') h++;
-      if (sexe == 'Femme') f++;
-
-      if (emploi == 'Étudiant') e++;
-      if (emploi == 'Employé') emp++;
-      if (emploi == 'Chômeur') c++;
-    }
-
-    setState(() {
-      totalUsers = snapshot.docs.length;
-      hommes = h;
-      femmes = f;
-      etudiants = e;
-      employes = emp;
-      chomeurs = c;
-      isLoading = false;
-    });
-  }*/
   Future<void> fetchStats() async {
     final snapshot = await FirebaseFirestore.instance.collection('User').get();
     final evalSnapshot = await FirebaseFirestore.instance.collection('Evaluations').get();
@@ -134,7 +106,7 @@ class _StylishStatsScreenState extends State<StylishStatsScreen> {
     return Scaffold(
       backgroundColor: Colors.white, // 🌞 mode clair
       appBar: AppBar(
-        title: const Text("Statistiques", style: TextStyle(color: Colors.black)),
+        title: const Text("Statistiques", style: TextStyle(color: Colors.white)),
         backgroundColor: Color(0xFFD5BA7F),
         elevation: 0,
         iconTheme: IconThemeData(color: Colors.black),
