@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "389544767613",
+    "project_id": "dztrainfay",
+    "storage_bucket": "dztrainfay.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:389544767613:android:f9a2ba4901433254bbc114",
+        "android_client_info": {
+          "package_name": "com.example.dztrainfay"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC219vrVdUDeWqnshGJ4FSvNCmGUhL41go"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

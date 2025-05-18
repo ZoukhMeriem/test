@@ -1,0 +1,118 @@
+name: dztrainfay
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.0
+
+dependencies:
+  wave: ^0.2.0
+  flutter:
+    sdk: flutter
+
+  # UI & design
+  cupertino_icons: ^1.0.8
+  font_awesome_flutter: ^10.0.0
+  animated_text_kit: ^4.2.2
+  emoji_picker_flutter: ^4.3.0
+  flutter_rating_bar: ^4.0.0
+  pie_chart: ^5.3.2
+  percent_indicator: ^4.2.5
+  # Local storage
+  shared_preferences: ^2.2.2
+  uuid: ^4.0.0
+  # Firebase
+  firebase_core: ^3.12.0
+  firebase_auth: ^5.5.0
+  cloud_firestore: ^5.6.4
+  firebase_storage: ^12.4.4
+  simple_animations: ^5.0.0
+  # Maps & Location
+
+  google_maps_flutter: ^2.10.1
+  google_maps_flutter_platform_interface: ^2.4.0
+  geolocator: ^13.0.2
+  geocoding: ^2.1.0
+  flutter_polyline_points: ^1.0.0  # ✅ compatible avec http 0.13.x
+
+  # Auth & Permissions
+  google_sign_in: ^6.0.0
+  permission_handler: ^11.0.0
+
+  # API & HTTP
+  dio: ^5.4.0
+  http: ^0.13.5  # ✅ compatible avec dialog_flowtter & polyline_points v1
+  intl: ^0.19.0
+
+  # File & Media
+  image_picker: ^1.0.7
+  flutter_sound: ^9.27.0
+
+  # State Management
+  provider: ^6.0.5
+
+  # Dialogflow AI chatbot
+  dialog_flowtter: ^0.3.3
+
+  # Localization
+  flutter_localizations:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.6
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/images/image-backround.png
+    - assets/images/image-backround1.png
+    - assets/images/image-backround2.png
+    - assets/images/image-backround3.png
+    - assets/images/app.png
+    - assets/images/signIn.jpg
+    - assets/images/screen1.png
+    - assets/images/screen2.png
+    - assets/images/screen3.png
+    - assets/images/ligne1.png
+    - assets/images/ligne3.png
+    - assets/images/ligne4.png
+    - assets/images/ligne5.png
+    - assets/images/transparent.png
+    - assets/images/sntf_logo.png
+    - assets/images/logo3.png
+    - assets/images/chat_animation.gif
+    - assets/dialogflow-auth.json
+    - assets/fonts/Montserrat/static/Montserrat-Regular.ttf
+    - assets/fonts/Montserrat/static/Montserrat-Bold.ttf
+    - assets/images/train_on_map.png
+
+  fonts:
+    - family: Montserrat
+      fonts:
+        - asset: assets/fonts/Montserrat/static/Montserrat-Regular.ttf
+        - asset: assets/fonts/Montserrat/static/Montserrat-Bold.ttf
+          weight: 700
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/images/logo3.png
+  android: true
+  ios: true
+  android_12:
+    image: assets/images/logo3.png
+    icon_background_color: "#FFFFFF"
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logo3.png"
+  adaptive_icon_background: "#FFFFFF"
+  min_sdk_android: 23
