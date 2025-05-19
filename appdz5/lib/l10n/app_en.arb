@@ -24,11 +24,109 @@
     }
   },
 
+  "nearestStations": "Nearest stations",
+  "@nearestStations": {
+    "description": "Title of the dialog showing nearest stations"
+  },
+  "stationDistance": "Distance: {distance} m",
+  "@stationDistance": {
+    "description": "Displays the distance between stations in meters",
+    "placeholders": {
+      "distance": {}
+    }
+  },
+  "viewRoutesMessage": "Check your travel routes",
+  "allFirestoreStations": "📌 All Firestore stations:",
+  "currentPositionNotDefinedWarning": "⚠️ Current position not defined!",
+  "noStationsAvailableWarning": "⚠️ No stations available!",
+  "currentLocationMessage": "📍 Current location",
+  "stationDistanceFromUser": "📌 Distance between {station} and user: {distance}m",
+  "nearest3Stations": "✅ Top 3 nearest stations: {stations}",
+  "noNearbyStation": "⚠️ No nearby station found!",
+  "departureMarker": "🚆 Departure",
+  "destinationMarker": "🏁 Destination",
+  "errorCannotFindStartOrDestination": "🚨 Error: Cannot find start or destination!",
+  "intermediateStationsDetected": "✅ Intermediate stations detected",
+  "intermediateStop": "🚉 Intermediate stop",
 
+  "locationErrorMessage": "Error getting location",
   "save_button": "Save",
   "cancel_button": "Cancel",
   "delete_button": "Delete",
+  "markerAddedFor": "📍 Marker added for:",
+  "intermediateStationNotFound": "⚠️ Intermediate station not found in _stations:",
+  "noNearbyStationsWarning": "⚠️ No nearby station found!",
+  "chooseStationTitle": "🚉 Choose a station",
+  "chooseDestinationStation": "🚉 Choose a destination station",
+  "routeUpdatedMessage": "✅ Route updated with {count} points!",
+  "@routeUpdatedMessage": {
+    "description": "Message shown when the route is updated with the number of points",
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "departureMessage": "🚆 Departure: {station} ({lines})",
+  "@departureMessage": {
+    "description": "Message displaying departure station and lines",
+    "placeholders": {
+      "station": {},
+      "lines": {}
+    }
+  },
+  "destinationMessage": "🚆 Destination: {station} ({lines})",
+  "@destinationMessage": {
+    "description": "Message displaying destination station and lines",
+    "placeholders": {
+      "station": {},
+      "lines": {}
+    }
+  },
+  "impossiblePathTitle": "🚨 Impossible route",
+  "impossiblePathContent": "The selected stations belong to different lines.",
+  "okButton": "OK",
+  "whereDoYouWantToGoToday": "Where do you want to go today?",
+  "myCurrentLocation": "📍 My current location",
+  "chooseDeparturePoint": "🏠 Choose a departure point",
+  "chooseDateTime": "📅 Choose a date and time",
+  "consultTravelRoutes": "Check your travel routes",
+  "chooseDepartureDestinationDate": "Please choose a departure, a destination, and a date",
+  "consultTrips": "Check Trips",
 
+  "chooseRoute": "Choose this route",
+  "routeRemovedFromFavorites": "❌ Route removed from favorites.",
+  "routeAddedToFavorites": "✅ Route added to favorites.",
+  "favorised": "Favorited",
+  "toFavorise": "Favorite",
+  "routeWithId": "Route: {id}",
+  "trainLabel": "TRAIN: {trainId}",
+
+  "lineLabel": "Line: {lineId}",
+  "seeDetails": "See details",
+  "trackageDuTrain": "Train Tracking",
+  "trainEnMouvement": "Train in motion",
+  "gare": "Station",
+  "gareNonTrouvee": "Station not found",
+
+
+"lostObjectForm_objectName": "Object Name",
+  "lostObjectForm_description": "Description",
+  "lostObjectForm_trainLine": "Train Line",
+  "lostObjectForm_station": "Relevant Station",
+  "lostObjectForm_selectDate": "No date selected",
+  "lostObjectForm_chooseDate": "Choose Date",
+  "lostObjectForm_submit": "Submit",
+  "lostObjectForm_errorMessage": "Error sending data. Please try again.",
+  "tripDetailTitle": "🛤️ Trip Detail",
+  "sameLineResult": "✅ Are the two stations on the same line? {result}",
+  "@sameLineResult": {
+    "description": "Message indicating whether the two stations are on the same line",
+    "placeholders": {
+      "result": {}
+    }
+  },
+  "jourDeCirculationLabel": "Circulation Day:",
+  "nonSpecifieLabel": "Not specified",
+  "prixLabel": "Price:",
   "profile_page_title": "My Profile",
   "profile_username": "Username",
   "profile_email": "Email",
