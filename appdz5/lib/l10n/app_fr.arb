@@ -27,6 +27,26 @@
   },
 
 
+  "nearestStations": "Gares les plus proches",
+  "@nearestStations": {
+    "description": "Titre de la boîte de dialogue affichant les gares les plus proches"
+  },
+  "stationDistance": "Distance : {distance} m",
+  "@stationDistance": {
+    "description": "Affiche la distance entre les gares en mètres",
+    "placeholders": {
+      "distance": {}
+    }
+  },
+  "viewRoutesMessage": "Consulter les trajets de votre voyage",
+  "@viewRoutesMessage": {
+    "description": "Message shown after searching travel routes"
+  },
+  "locationErrorMessage": "Erreur lors de la récupération de la position",
+  "@locationErrorMessage": {
+    "description": "Message shown when there is an error getting the location"
+  },
+  "allFirestoreStations": "📌 Toutes les gares Firestore :",
 
   "cancel_button": "Annuler",
   "delete_button": "Supprimer",
@@ -248,10 +268,54 @@
   "chatInconnu": "Chat inconnu",
   "aucunMessage": "Aucun message",
   "aucuneDiscussionDisponible": "Aucune discussion disponible.",
-  "welcomeToTainbot": "Bienvenue dans Tقainbot !",
+  "welcomeToTainbot": "Bienvenue dans Trainbot !",
   "startButton": "Commencer",
+  "currentPositionNotDefinedWarning": "⚠️ Position actuelle non définie !",
+  "noStationsAvailableWarning": "⚠️ Aucune gare disponible !",
+  "currentLocationMessage": "📍 Position actuelle",
+  "stationDistanceFromUser": "📌 Distance entre {station} et utilisateur: {distance}m",
+  "@stationDistanceFromUser": {
+    "description": "Affiche la distance entre une station et l'utilisateur",
+    "placeholders": {
+      "station": {},
+      "distance": {}
+    }
+  },
+  "nearest3Stations": "✅ 3 gares les plus proches : {stations}",
+  "@nearest3Stations": {
+    "description": "Liste les 3 gares les plus proches avec leurs distances",
+    "placeholders": {
+      "stations": {}
+    }
+  },
+  "noNearbyStation": "⚠️ Aucune gare proche trouvée !",
+  "@noNearbyStation": {
+    "description": "Message affiché lorsqu'aucune gare proche n'est trouvée"
+  },
+  "departureMarker": "🚆 Départ",
+  "destinationMarker": "🏁 Destination",
+  "@departureMarker": {
+    "description": "Texte affiché dans l'infobulle du marqueur de départ"
+  },
+  "@destinationMarker": {
+    "description": "Texte affiché dans l'infobulle du marqueur de destination"
+  },
 
-  "createPasswordTitle": "Créer un nouveau mot de passe",
+
+  "errorCannotFindStartOrDestination": "🚨 Erreur : Impossible de trouver le départ ou la destination !",
+  "intermediateStop": "🚉 Arrêt intermédiaire",
+  "markerAddedFor": "📍 Marqueur ajouté pour :",
+  "intermediateStationNotFound": "⚠️ La gare intermédiaire n'existe pas dans _stations :",
+  "noNearbyStationsWarning": "⚠️ Aucune gare trouvée à proximité !",
+  "chooseStationTitle": "🚉 Choisir une gare",
+
+  "chooseDestinationStation": "🚉 Choisir une gare de destination",
+
+
+  "intermediateStationsDetected": "✅ Gares intermédiaires détectées",
+
+
+"createPasswordTitle": "Créer un nouveau mot de passe",
   "newPassword": "Nouveau mot de passe",
 
   "invalidPassword": "🔒 Entrez un mot de passe valide (min. 6 caractères).",
@@ -461,8 +525,76 @@
   "signInWithGoogle": "Se connecter avec Google",
   "noAccountRegister": "Vous n'avez pas de compte ? Inscrivez-vous",
   "incorrectUsernameOrPassword": "Nom d'utilisateur ou mot de passe incorrect",
-  "loginError": "Erreur lors de la connexion : {error}"
+  "loginError": "Erreur lors de la connexion : {error}",
+
+  "routeUpdatedMessage": "✅ Route mise à jour avec {count} points !",
+  "routeUpdatedMessage_plural": "✅ Route mise à jour avec {count} points !",
+  "@routeUpdatedMessage": {
+    "description": "Message affiché lors de la mise à jour de la route avec le nombre de points",
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "sameLineResult": "✅ Les deux gares sont sur la même ligne ? {result}",
+  "@sameLineResult": {
+    "description": "Message indiquant si les deux gares sont sur la même ligne",
+    "placeholders": {
+      "result": {}
+    }
+  },
+  "impossiblePathTitle": "🚨 Chemin impossible",
+  "impossiblePathContent": "Les gares sélectionnées appartiennent à des lignes différentes.",
+  "okButton": "OK",
+  "whereDoYouWantToGoToday": "Où souhaitez-vous aller aujourd'hui?",
+  "myCurrentLocation": "📍 Ma position actuelle",
+  "chooseDeparturePoint": "🏠 Choisir un point de départ",
+  "chooseDateTime": "📅 Choisir une date et heure",
+  "consultTravelRoutes": "Consulter les trajets de votre voyage",
+  "chooseDepartureDestinationDate": "Veuillez choisir un départ, une destination et une date",
+  "consultTrips": "Consulter les trajets",
+  "favorised": "Favorisé",
+  "trainLabel": "TRAIN : {trainId}",
+  "lineLabel": "Ligne : {lineId}",
+
+  "seeDetails": "Voir détails",
+  "trackageDuTrain": "Trackage du Train",
+  "trainEnMouvement": "Train en mouvement",
+  "gare": "Gare",
+  "gareNonTrouvee": "Gare non trouvée",
 
 
+"toFavorise": "Favoriser",
+  "routeWithId": "Trajet : {id}",
+  "lostObjectForm_objectName": "Nom de l'objet",
+  "lostObjectForm_description": "Description",
+  "lostObjectForm_trainLine": "Ligne de train",
+  "lostObjectForm_station": "Gare concernée",
+  "lostObjectForm_selectDate": "Aucune date sélectionnée",
+  "lostObjectForm_chooseDate": "Choisir la date",
+  "lostObjectForm_submit": "Envoyer",
+  "chooseRoute": "Choisir ce trajet",
+  "routeRemovedFromFavorites": "❌ Trajet retiré des favoris.",
+  "routeAddedToFavorites": "✅ Trajet ajouté aux favoris.",
+  "lostObjectForm_errorMessage": "Erreur lors de l'envoi. Veuillez réessayer.",
+  "departureMessage": "🚆 Départ : {station} ({lines})",
+  "@departureMessage": {
+    "description": "Message affichant la gare de départ et les lignes associées",
+    "placeholders": {
+      "station": {},
+      "lines": {}
+    }
+  },
+  "tripDetailTitle": "🛤️ Détail du trajet",
+  "jourDeCirculationLabel": "Jour de Circulation:",
+  "nonSpecifieLabel": "Non spécifié",
+  "prixLabel": "Prix:",
+  "destinationMessage": "🚆 Destination : {station} ({lines})",
+  "@destinationMessage": {
+    "description": "Message affichant la gare de destination et les lignes associées",
+    "placeholders": {
+      "station": {},
+      "lines": {}
+    }
+  }
 
 }
