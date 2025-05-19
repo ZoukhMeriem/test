@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Import de la localisation générée
 import 'liste_trajets_screen.dart'; // Pour utiliser la classe Trajet
 
 class SimulationLocalePage extends StatefulWidget {
@@ -58,7 +59,7 @@ class _SimulationLocalePageState extends State<SimulationLocalePage> {
         final lng = data['location']['lng'];
         simulatedRoute.add(LatLng(lat, lng));
       } else {
-        print("\u274C Gare non trouv\u00e9e : $nom");
+        print("\u274C ${AppLocalizations.of(context)!.gareNonTrouvee} : $nom");
       }
     }
   }
@@ -87,7 +88,7 @@ class _SimulationLocalePageState extends State<SimulationLocalePage> {
         markerId: MarkerId("train"),
         position: smoothPath[0],
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
-        infoWindow: InfoWindow(title: "Train en mouvement"),
+        infoWindow: InfoWindow(title: AppLocalizations.of(context)!.trainEnMouvement),
       );
     });
 
@@ -118,9 +119,11 @@ class _SimulationLocalePageState extends State<SimulationLocalePage> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("Trackage du Train"),
+        title: Text(loc.trackageDuTrain),
         backgroundColor: Color(0xFF8BB1FF),
       ),
       body: simulatedRoute.isEmpty
@@ -146,7 +149,7 @@ class _SimulationLocalePageState extends State<SimulationLocalePage> {
                     ? BitmapDescriptor.hueRed
                     : BitmapDescriptor.hueAzure,
               ),
-              infoWindow: InfoWindow(title: "Gare ${index + 1}"),
+              infoWindow: InfoWindow(title: "${loc.gare} ${index + 1}"),
             );
           }),
         },
