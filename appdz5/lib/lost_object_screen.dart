@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // <-- import localisation
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'dart:io';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'lost_object_status_screen.dart';
 
 const Color mainColor = Color(0x998BB1FF);
@@ -16,75 +12,79 @@ class LostObjectFormScreen extends StatefulWidget {
 
 class _LostObjectFormScreenState extends State<LostObjectFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
+
+  final TextEditingController _objectNameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _trainLineController = TextEditingController();
-  final TextEditingController _trainNumberController = TextEditingController();
-  final TextEditingController _dateController = TextEditingController();
-  File? _image;
-  String _twoDigits(int n) => n.toString().padLeft(2, '0');
+  final TextEditingController _stationController = TextEditingController();
+  DateTime? _selectedDateTime;
 
-  Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() => _image = File(pickedFile.path));
-    }
-  }
-
-  Future<String?> _uploadImage(File image) async {
-    try {
-      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      Reference ref = FirebaseStorage.instance.ref().child("lost_objects/$fileName.jpg");
-      UploadTask uploadTask = ref.putFile(image);
-      TaskSnapshot snapshot = await uploadTask;
-      return await snapshot.ref.getDownloadURL();
-    } catch (e) {
-      print("❌ Erreur lors de l'upload de l'image : $e");
-      return null;
+  Future<void> _pickDateTime() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: _selectedDateTime ?? DateTime.now(),
+      firstDate: DateTime(2023),
+      lastDate: DateTime(2100),
+    );
+    if (date != null) {
+      final time = await showTimePicker(
+        context: context,
+        initialTime: _selectedDateTime != null
+            ? TimeOfDay.fromDateTime(_selectedDateTime!)
+            : TimeOfDay.now(),
+      );
+      if (time != null) {
+        setState(() {
+          _selectedDateTime = DateTime(
+            date.year,
+            date.month,
+            date.day,
+            time.hour,
+            time.minute,
+          );
+        });
+      }
     }
   }
 
   Future<void> _submitForm() async {
+    final loc = AppLocalizations.of(context)!;
+
     if (_formKey.currentState!.validate()) {
       try {
-        final selectedDate = DateTime.parse(_dateController.text);
-        final now = DateTime.now();
+        await FirebaseFirestore.instance.collection('lost_objects').add({
+          'name': _objectNameController.text.trim(),
+          'trainLine': _trainLineController.text.trim(),
+          'description': _descriptionController.text.trim(),
+          'station': _stationController.text.trim(),
+          'date': _selectedDateTime?.toIso8601String() ?? DateTime.now().toIso8601String(),
+          'status': 'En cours de traitement',
+          'createdAt': Timestamp.now(),
+        });
 
-        if (selectedDate.isAfter(now)) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("❌ La date ne peut pas être dans le futur.")),
-          );
-          return;
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(loc.lostObjectForm_successMessage),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        await Future.delayed(const Duration(seconds: 2));
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LostObjectStatusScreen()),
+        );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("❌ Date invalide.")),
+          SnackBar(
+            content: Text(loc.lostObjectForm_errorMessage),
+            backgroundColor: Colors.red,
+          ),
         );
-        return;
       }
-
-      String? imageUrl;
-      if (_image != null) {
-        imageUrl = await _uploadImage(_image!);
-      }
-
-      await FirebaseFirestore.instance.collection('lost_objects').add({
-        'name': _nameController.text,
-        'description': _descriptionController.text,
-        'trainLine': _trainLineController.text,
-        'trainNumber': _trainNumberController.text,
-        'date': _dateController.text,
-        'imageUrl': imageUrl,
-        'status': 'En cours de traitement',
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.lostObjectForm_successMessage)),
-      );
-      Navigator.pop(context);
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -96,109 +96,76 @@ class _LostObjectFormScreenState extends State<LostObjectFormScreen> {
         backgroundColor: mainColor,
       ),
       body: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Form(
           key: _formKey,
           child: ListView(
             children: [
-              _buildTextField(loc.lostObjectForm_nameLabel, Icons.business, _nameController, true),
-              SizedBox(height: 15),
-              _buildTextField(loc.lostObjectForm_descriptionLabel, Icons.description, _descriptionController, true),
-              SizedBox(height: 15),
-              _buildTextField(loc.lostObjectForm_trainLineLabel, Icons.train, _trainLineController, false),
-              SizedBox(height: 15),
-              _buildTextField(loc.lostObjectForm_trainNumberLabel, Icons.confirmation_number, _trainNumberController, false),
-              SizedBox(height: 15),
+              _buildTextField(loc.lostObjectForm_objectName, Icons.business, _objectNameController, true),
+              const SizedBox(height: 15),
+              _buildTextField(loc.lostObjectForm_description, Icons.description, _descriptionController, true, maxLines: 3),
+              const SizedBox(height: 15),
+              _buildTextField(loc.lostObjectForm_trainLine, Icons.train, _trainLineController, true),
+              const SizedBox(height: 15),
+              _buildTextField(loc.lostObjectForm_station, Icons.location_on, _stationController, true),
 
-              TextFormField(
-                controller: _dateController,
-                style: TextStyle(color: Colors.black), // Pour affichage en noir
-                decoration: InputDecoration(
-                  labelText: loc.lostObjectForm_dateLabel,
-                  labelStyle: TextStyle(color: Colors.black),
-                  prefixIcon: Icon(Icons.calendar_today, color: Colors.black87),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-                readOnly: true,
-                onTap: () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2022),
-                    lastDate: DateTime(2030),
-                  );
-
-                  if (pickedDate != null) {
-                    TimeOfDay? pickedTime = await showTimePicker(
-                      context: context,
-                      initialTime: TimeOfDay.now(),
-                    );
-
-                    if (pickedTime != null) {
-                      final DateTime fullDateTime = DateTime(
-                        pickedDate.year,
-                        pickedDate.month,
-                        pickedDate.day,
-                        pickedTime.hour,
-                        pickedTime.minute,
-                      );
-
-                      _dateController.text =
-                      "${fullDateTime.year}-${_twoDigits(fullDateTime.month)}-${_twoDigits(fullDateTime.day)} "
-                          "${_twoDigits(fullDateTime.hour)}:${_twoDigits(fullDateTime.minute)}";
-                    }
-                  }
-                },
-              ),
-
-
-              SizedBox(height: 20),
+              const SizedBox(height: 15),
 
               GestureDetector(
-                onTap: _pickImage,
-                child: Container(
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.black87.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.camera_alt, color: Colors.black87),
-                      SizedBox(width: 8),
-                      Text(loc.lostObjectForm_addPhoto, style: TextStyle(color: Colors.black87)),
-                    ],
+                onTap: _pickDateTime,
+                child: AbsorbPointer(
+                  child: TextFormField(
+                    style: const TextStyle(color: Colors.black87), // <-- couleur texte forcée
+                    decoration: InputDecoration(
+                      labelText: loc.lostObjectForm_dateLabel,
+                      prefixIcon: const Icon(Icons.calendar_today, color: Colors.black87),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      labelStyle: const TextStyle(color: Colors.black54),
+                    ),
+                    validator: (value) {
+                      if (_selectedDateTime == null) {
+                        return loc.lostObjectForm_requiredField;
+                      }
+                      return null;
+                    },
+                    controller: TextEditingController(
+                      text: _selectedDateTime == null
+                          ? ''
+                          : '${_selectedDateTime!.day.toString().padLeft(2, '0')}/'
+                          '${_selectedDateTime!.month.toString().padLeft(2, '0')}/'
+                          '${_selectedDateTime!.year} '
+                          '${_selectedDateTime!.hour.toString().padLeft(2, '0')}:'
+                          '${_selectedDateTime!.minute.toString().padLeft(2, '0')}',
+                    ),
                   ),
                 ),
               ),
 
-              if (_image != null)
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10),
-                  child: Image.file(_image!, height: 150, fit: BoxFit.cover),
-                ),
+              const SizedBox(height: 25),
 
-              SizedBox(height: 20),
-
-              ElevatedButton(
+              ElevatedButton.icon(
                 onPressed: _submitForm,
+                icon: const Icon(Icons.send),
+                label: Text(loc.lostObjectForm_sendButton),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: mainColor,
-                  padding: EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                child: Text(loc.lostObjectForm_sendButton, style: TextStyle(fontSize: 16, color: Colors.white)),
               ),
 
-              SizedBox(height: 10),
+              const SizedBox(height: 15),
 
               Center(
                 child: TextButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => LostObjectStatusScreen()));
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => LostObjectStatusScreen()));
                   },
-                  child: Text(loc.lostObjectForm_consultLostObjects, style: TextStyle(color: Colors.black87, fontSize: 16)),
+                  child: Text(
+                    loc.lostObjectForm_consultLostObjects,
+                    style: const TextStyle(fontSize: 16, color: Colors.black87),
+                  ),
                 ),
               ),
             ],
@@ -208,19 +175,13 @@ class _LostObjectFormScreenState extends State<LostObjectFormScreen> {
     );
   }
 
-  Widget _buildTextField(String label, IconData icon, TextEditingController controller, bool required) {
+  Widget _buildTextField(String label, IconData icon, TextEditingController controller, bool required, {int maxLines = 1}) {
     final loc = AppLocalizations.of(context)!;
+
     return TextFormField(
       controller: controller,
-      style: TextStyle(color: Colors.black),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Colors.black), // ✅ label en noir
-        prefixIcon: Icon(icon, color: Colors.black87),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
+      maxLines: maxLines,
+      style: const TextStyle(color: Colors.black87), // <-- couleur texte forcée
       validator: required
           ? (value) {
         if (value == null || value.isEmpty) {
@@ -229,6 +190,14 @@ class _LostObjectFormScreenState extends State<LostObjectFormScreen> {
         return null;
       }
           : null,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color: Colors.black87),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        labelStyle: const TextStyle(color: Colors.black54),
+      ),
     );
   }
 }
