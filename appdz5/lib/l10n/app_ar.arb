@@ -352,7 +352,31 @@
   "successTitle": "نجاح",
   "accountCreated": "تم إنشاء الحساب بنجاح!",
   "welcomeMessage": "مرحبًا بك، يمكنك الآن تسجيل الدخول.",
-
+  "nearestStations": "أقرب المحطات",
+  "@nearestStations": {
+    "description": "عنوان مربع الحوار الذي يعرض أقرب المحطات"
+  },
+  "stationDistance": "المسافة: {distance} متر",
+  "@stationDistance": {
+    "description": "يعرض المسافة بين المحطات بالأمتار",
+    "placeholders": {
+      "distance": {}
+    }
+  },
+  "viewRoutesMessage": "اطلع على مسارات رحلتك",
+  "locationErrorMessage": "خطأ أثناء الحصول على الموقع",
+  "allFirestoreStations": "📌 جميع محطات فايرستور:",
+  "currentPositionNotDefinedWarning": "⚠️ لم يتم تحديد الموقع الحالي!",
+  "noStationsAvailableWarning": "⚠️ لا توجد محطات متاحة!",
+  "currentLocationMessage": "📍 الموقع الحالي",
+  "stationDistanceFromUser": "📌 المسافة بين {station} والمستخدم: {distance}م",
+  "nearest3Stations": "✅ أقرب 3 محطات: {stations}",
+  "noNearbyStation": "⚠️ لا توجد محطة قريبة!",
+  "departureMarker": "🚆 الانطلاق",
+  "destinationMarker": "🏁 الوجهة",
+  "errorCannotFindStartOrDestination": "🚨 خطأ: تعذر العثور على نقطة الانطلاق أو الوجهة!",
+  "intermediateStationsDetected": "✅ تم الكشف عن المحطات الوسيطة",
+  "intermediateStop": "🚉 محطة وسطية",
   "password": "كلمة المرور",
   "forgotPassword": "هل نسيت كلمة المرور؟",
 
@@ -361,14 +385,82 @@
 
   "createAccount": "إنشاء حساب",
   "welcomeFillInfo": "مرحبًا! الرجاء ملء معلوماتك.",
-
+  "markerAddedFor": "📍 تم إضافة العلامة لـ:",
+  "intermediateStationNotFound": "⚠️ المحطة الوسيطة غير موجودة في _stations:",
+  "noNearbyStationsWarning": "⚠️ لم يتم العثور على أي محطة قريبة!",
+  "chooseStationTitle": "🚉 اختر محطة",
+  "chooseDestinationStation": "🚉 اختر محطة الوصول",
+  "routeUpdatedMessage": "✅ تم تحديث المسار مع {count} نقاط!",
+  "@routeUpdatedMessage": {
+    "description": "رسالة تظهر عند تحديث المسار مع عدد النقاط",
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "departureMessage": "🚆 المغادرة: {station} ({lines})",
+  "@departureMessage": {
+    "description": "رسالة تعرض محطة المغادرة والخطوط المرتبطة",
+    "placeholders": {
+      "station": {},
+      "lines": {}
+    }
+  },
+  "destinationMessage": "🚆 الوجهة: {station} ({lines})",
+  "@destinationMessage": {
+    "description": "رسالة تعرض محطة الوجهة والخطوط المرتبطة",
+    "placeholders": {
+      "station": {},
+      "lines": {}
+    }
+  },
+  "sameLineResult": "✅ هل المحطتان على نفس الخط؟ {result}",
+  "@sameLineResult": {
+    "description": "رسالة تشير ما إذا كانت المحطتان على نفس الخط",
+    "placeholders": {
+      "result": {}
+    }
+  },
+  "impossiblePathTitle": "🚨 مسار مستحيل",
+  "impossiblePathContent": "المحطات المختارة تنتمي إلى خطوط مختلفة.",
+  "okButton": "حسناً",
+  "whereDoYouWantToGoToday": "أين تريد الذهاب اليوم؟",
+  "myCurrentLocation": "📍 موقعي الحالي",
+  "chooseDeparturePoint": "🏠 اختر نقطة الانطلاق",
+  "chooseDateTime": "📅 اختر التاريخ والوقت",
+  "consultTravelRoutes": "اطلع على مسارات رحلتك",
+  "chooseDepartureDestinationDate": "يرجى اختيار نقطة انطلاق ووجهة وتاريخ",
+  "consultTrips": "عرض الرحلات",
+  "chooseRoute": "اختر هذا المسار",
+  "routeRemovedFromFavorites": "❌ تم حذف المسار من المفضلة.",
+  "routeAddedToFavorites": "✅ تم إضافة المسار إلى المفضلة.",
+  "favorised": "مُفضّل",
+  "toFavorise": "أضف إلى المفضلة",
+  "routeWithId": "المسار: {id}",
+  "trainLabel": "القطار: {trainId}",
+  "trackageDuTrain": "تتبع القطار",
+  "trainEnMouvement": "القطار في حركة",
+  "gare": "محطة",
+  "gareNonTrouvee": "المحطة غير موجودة",
+  "seeDetails": "عرض التفاصيل",
+  "lineLabel": "الخط: {lineId}",
+  "lostObjectForm_objectName": "اسم الغرض",
+  "lostObjectForm_description": "الوصف",
+  "lostObjectForm_trainLine": "خط القطار",
+  "lostObjectForm_station": "المحطة المعنية",
+  "lostObjectForm_selectDate": "لم يتم اختيار تاريخ",
+  "lostObjectForm_chooseDate": "اختر التاريخ",
+  "lostObjectForm_submit": "إرسال",
+  "lostObjectForm_errorMessage": "حدث خطأ أثناء الإرسال. الرجاء المحاولة مرة أخرى.",
   "emailAddress": "البريد الإلكتروني",
   "create_account": "إنشاء حساب",
   "welcome_fill_info": "مرحبًا! املأ معلوماتك.",
   "first_name": "الاسم الأول",
   "last_name": "اللقب",
   "email_address": "البريد الإلكتروني",
-
+  "tripDetailTitle": "🛤️ تفاصيل الرحلة",
+  "jourDeCirculationLabel": "يوم السير:",
+  "nonSpecifieLabel": "غير محدد",
+  "prixLabel": "السعر:",
   "job_type": "نوع الوظيفة",
   "specify_job": "حدد وظيفتك",
 
