@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'SimulationLocalePage.dart';
 import 'tracage_page.dart'; // adapte le nom selon ton fichier réel
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class GareIntermediaire {
   String gare;
@@ -178,7 +179,7 @@ class _ListeTrajetsScreenState extends State<ListeTrajetsScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "🛤️ Détail du trajet",
+                    AppLocalizations.of(context)!.tripDetailTitle,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -207,13 +208,18 @@ class _ListeTrajetsScreenState extends State<ListeTrajetsScreen> {
 
               // Infos
               _buildInfoText(
-                "Jour de Circulation:",
-                trajet.jourDeCirculation.isNotEmpty ? trajet.jourDeCirculation : "Non spécifié",
+                AppLocalizations.of(context)!.jourDeCirculationLabel,
+                trajet.jourDeCirculation.isNotEmpty
+                    ? trajet.jourDeCirculation
+                    : AppLocalizations.of(context)!.nonSpecifieLabel,
               ),
               const SizedBox(height: 10),
-              _buildInfoText("Prix:", "70 DA"),
-
+              _buildInfoText(
+                AppLocalizations.of(context)!.prixLabel,
+                "70 DA",
+              ),
               const SizedBox(height: 20),
+
 
               // Actions
               Row(
@@ -235,8 +241,7 @@ class _ListeTrajetsScreenState extends State<ListeTrajetsScreen> {
 
 
                     icon: Icon(Icons.check_circle_outline),
-                    label: Text("Choisir ce trajet"),
-                    style: ElevatedButton.styleFrom(
+                    label: Text(AppLocalizations.of(context)!.chooseRoute),                    style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0x998BB1FF),
                       foregroundColor: Colors.black87,
                       shape: RoundedRectangleBorder(
@@ -353,7 +358,9 @@ class _ListeTrajetsScreenState extends State<ListeTrajetsScreen> {
                     .delete();
 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("❌ Trajet retiré des favoris.")),
+                  SnackBar(
+                    content: Text(AppLocalizations.of(context)!.routeRemovedFromFavorites),
+                  ),
                 );
               } else {
                 // Ajouter aux favoris dans Firestore
@@ -371,8 +378,11 @@ class _ListeTrajetsScreenState extends State<ListeTrajetsScreen> {
                 });
 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("✅ Trajet ajouté aux favoris.")),
+                  SnackBar(
+                    content: Text(AppLocalizations.of(context)!.routeAddedToFavorites),
+                  ),
                 );
+
               }
             } catch (e) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -385,7 +395,9 @@ class _ListeTrajetsScreenState extends State<ListeTrajetsScreen> {
             color: isFavorised ? Colors.white : Colors.black,
           ),
           label: Text(
-            isFavorised ? "Favorisé" : "Favoriser",
+            isFavorised
+                ? AppLocalizations.of(context)!.favorised
+                : AppLocalizations.of(context)!.toFavorise,
             style: TextStyle(
               color: isFavorised ? Colors.white : Colors.black,
               fontWeight: FontWeight.bold,
@@ -478,13 +490,16 @@ class _ListeTrajetsScreenState extends State<ListeTrajetsScreen> {
                         ),
                         const SizedBox(width: 10),
                         Text(
-                          "Trajet : ${trajet.id.toString().padLeft(2, '0')}",
+                          AppLocalizations.of(context)!.routeWithId(
+                            trajet.id.toString().padLeft(2, '0'),
+                          ),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: isDark ? Colors.white : Colors.black,
                           ),
                         ),
+
                       ],
                     ),
                     const SizedBox(height: 10),
@@ -541,19 +556,21 @@ class _ListeTrajetsScreenState extends State<ListeTrajetsScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "TRAIN: ${trajet.trainId}",
+                          AppLocalizations.of(context)!.trainLabel(trajet.trainId),
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
                             color: isDark ? Colors.white70 : Colors.black,
                           ),
                         ),
+
                         Text(
-                          "Ligne: ${trajet.lineId}",
+                          AppLocalizations.of(context)!.lineLabel(trajet.lineId),
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
                             color: isDark ? Colors.white70 : Colors.black,
                           ),
                         ),
+
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -561,7 +578,7 @@ class _ListeTrajetsScreenState extends State<ListeTrajetsScreen> {
                       alignment: Alignment.centerRight,
                       child: ElevatedButton.icon(
                         icon: const Icon(Icons.info_outline),
-                        label: const Text("Voir détails"),
+                        label: Text(AppLocalizations.of(context)!.seeDetails),
                         onPressed: () => _showDetailsBottomSheet(context, trajet),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0x998BB1FF),
