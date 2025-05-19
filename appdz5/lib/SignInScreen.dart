@@ -76,7 +76,7 @@ class _SignInScreenState extends State<SignInScreen> {
     </ul>
     <p>Nous sommes ravis de vous compter parmi nous !</p>
     <p>
-      👉 <a href="https://dztrain.com" style="color: #1976d2;">Découvrir l’application DzTrain</a>
+   👉 <a href="https://dztrain.com" style="color: #1976d2;">Découvrir l’application DzTrain</a>
     </p>
     <hr style="border: none; border-top: 1px solid #ccc;">
     <p style="font-size: 12px; color: #888;">

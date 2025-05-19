@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'SimulationLocalePage.dart';
 import 'tracage_page.dart'; // adapte le nom selon ton fichier réel
 
 class GareIntermediaire {
@@ -227,9 +228,7 @@ class _ListeTrajetsScreenState extends State<ListeTrajetsScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => TracagePage(
-                            trajet: trajet, // 💡 Passe le trajet sélectionné
-                          ),
+                          builder: (_) => SimulationLocalePage(trajet: trajet),
                         ),
                       );
                     },

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -9,17 +10,27 @@ class SuiviTempsReelPage extends StatefulWidget {
   const SuiviTempsReelPage({super.key, required this.trajet});
 
   @override
-  State<SuiviTempsReelPage> createState() => _CarteTrajetPageState();
+  State<SuiviTempsReelPage> createState() => _SuiviTempsReelPageState();
 }
 
-class _CarteTrajetPageState extends State<SuiviTempsReelPage> {
+class _SuiviTempsReelPageState extends State<SuiviTempsReelPage> {
   GoogleMapController? mapController;
   List<LatLng> points = [];
+
+  Marker? movingMarker;
+  int currentIndex = 0;
+  Timer? movementTimer;
 
   @override
   void initState() {
     super.initState();
     chargerPoints();
+  }
+
+  @override
+  void dispose() {
+    movementTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> chargerPoints() async {
@@ -31,10 +42,11 @@ class _CarteTrajetPageState extends State<SuiviTempsReelPage> {
 
     points = await fetchGareLocations(nomsGares);
     setState(() {});
+    startTrainSimulation(); // 🚀 Démarre la simulation dès que les points sont chargés
   }
 
   Future<List<LatLng>> fetchGareLocations(List<String> nomsGares) async {
-    List<LatLng> points = [];
+    List<LatLng> positions = [];
 
     for (String nom in nomsGares) {
       var snapshot = await FirebaseFirestore.instance
@@ -46,18 +58,47 @@ class _CarteTrajetPageState extends State<SuiviTempsReelPage> {
         var data = snapshot.docs.first.data();
         var lat = data['location']['lat'];
         var lng = data['location']['lng'];
-        points.add(LatLng(lat, lng));
+        positions.add(LatLng(lat, lng));
       }
     }
 
-    return points;
+    return positions;
+  }
+
+  void startTrainSimulation() {
+    if (points.isEmpty) return;
+
+    movingMarker = Marker(
+      markerId: MarkerId("train"),
+      position: points[0],
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
+      infoWindow: InfoWindow(title: "Train en mouvement"),
+    );
+
+    movementTimer = Timer.periodic(Duration(seconds: 2), (timer) {
+      if (currentIndex < points.length) {
+        setState(() {
+          movingMarker = movingMarker!.copyWith(
+            positionParam: points[currentIndex],
+          );
+        });
+
+        mapController?.animateCamera(
+          CameraUpdate.newLatLng(points[currentIndex]),
+        );
+
+        currentIndex++;
+      } else {
+        timer.cancel(); // Arrêt de la simulation à la fin
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Carte du Trajet"),
+        title: const Text("Suivi en Temps Réel"),
         backgroundColor: Color(0xFF8BB1FF),
       ),
       body: points.isEmpty
@@ -65,34 +106,38 @@ class _CarteTrajetPageState extends State<SuiviTempsReelPage> {
           : GoogleMap(
         initialCameraPosition: CameraPosition(
           target: points.first,
-          zoom: 11,
+          zoom: 12,
         ),
         onMapCreated: (controller) {
           mapController = controller;
         },
-        markers: points
-            .asMap()
-            .entries
-            .map((entry) => Marker(
-          markerId: MarkerId("point_${entry.key}"),
-          position: entry.value,
-          infoWindow: InfoWindow(title: "Gare ${entry.key + 1}"),
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            entry.key == 0
-                ? BitmapDescriptor.hueGreen // Départ
-                : entry.key == points.length - 1
-                ? BitmapDescriptor.hueRed // Arrivée
-                : BitmapDescriptor.hueAzure, // Intermédiaires
-          ),
-        ))
-            .toSet(),
+        markers: {
+          if (movingMarker != null) movingMarker!,
+          ...points.asMap().entries.map((entry) {
+            final index = entry.key;
+            final point = entry.value;
+
+            return Marker(
+              markerId: MarkerId("point_$index"),
+              position: point,
+              infoWindow: InfoWindow(title: "Gare ${index + 1}"),
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                index == 0
+                    ? BitmapDescriptor.hueGreen // Départ
+                    : index == points.length - 1
+                    ? BitmapDescriptor.hueRed // Arrivée
+                    : BitmapDescriptor.hueAzure, // Intermédiaires
+              ),
+            );
+          }),
+        },
         polylines: {
           Polyline(
             polylineId: const PolylineId("trajet"),
             points: points,
             color: Colors.blueAccent,
             width: 4,
-          )
+          ),
         },
       ),
     );
