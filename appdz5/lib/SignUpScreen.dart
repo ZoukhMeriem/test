@@ -3,21 +3,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:dztrainfay/SuccessPage.dart';
 
-// Couleurs personnalisées avec le nouveau design pastel
 const LinearGradient backgroundGradient = LinearGradient(
   begin: Alignment.topCenter,
   end: Alignment.bottomCenter,
   colors: [
-    Color(0xFFA4C6A8), // Vert doux
-    Color(0xFFF4D9DE), // Rose pâle
-    Color(0xFFDDD7E8), // Violet clair
+    Color(0xFFA3BED8), // bleu-gris moyen clair
+    Color(0xFFD1D9E6), // gris bleu clair
+    Color(0xFFF0F4F8), // blanc cassé très clair
   ],
 );
 
-const Color primaryColor = Color(0x998BB1FF); // Indigo clair semi-transparent
-const Color cardColor = Colors.white; // Fond des champs de texte
-const Color textColor = Colors.black87; // Texte principal
-const Color subtitleColor = Colors.grey; // Texte secondaire
+const Color primaryColor = Color(0xFF5677A3); // bleu moyen pour les boutons
+const Color primaryColorDark = Color(0xFF425B78); // bleu-gris plus sombre
+const Color cardColor = Colors.white; // fond des champs texte
+const Color textColor = Colors.black87; // texte principal
+const Color subtitleColor = Colors.grey; // texte secondaire
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -37,12 +37,10 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController confirmPasswordController = TextEditingController();
   final TextEditingController autreEmploiController = TextEditingController();
 
-  // Valeurs internes, utilisées pour enregistrer dans Firestore
   String selectedEmploi = "student";
   String selectedSexe = "male";
   bool _isPasswordVisible = false;
 
-  // Méthodes pour récupérer les labels traduits selon la clé
   String getGenderLabel(String genderKey, AppLocalizations local) {
     switch (genderKey) {
       case 'male':
@@ -91,7 +89,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       style: const TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF3F51B5), // Indigo
+                        color: Color(0xFF425B78), // bleu-gris plus sombre
                       ),
                     ),
                   ),
@@ -149,7 +147,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 14.0),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.0),
+                          borderRadius: BorderRadius.circular(30),
                         ),
                         elevation: 4,
                       ),
