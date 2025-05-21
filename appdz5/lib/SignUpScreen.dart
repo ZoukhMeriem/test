@@ -1,165 +1,316 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dztrainfay/HomePage.dart';
+import 'package:dztrainfay/SignUpScreen.dart';
+import 'package:dztrainfay/ForgotPasswordScreen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import 'package:shared_preferences/shared_preferences.dart';
+import 'Admin/AdminHomePage.dart';
+
+// Import localisation
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:dztrainfay/SuccessPage.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
 
-// Couleurs personnalisées avec le nouveau design pastel
-const LinearGradient backgroundGradient = LinearGradient(
-  begin: Alignment.topCenter,
-  end: Alignment.bottomCenter,
-  colors: [
-    Color(0xFFA4C6A8), // Vert doux
-    Color(0xFFF4D9DE), // Rose pâle
-    Color(0xFFDDD7E8), // Violet clair
-  ],
-);
-
-const Color primaryColor = Color(0x998BB1FF); // Indigo clair semi-transparent
-const Color cardColor = Colors.white; // Fond des champs de texte
-const Color textColor = Colors.black87; // Texte principal
-const Color subtitleColor = Colors.grey; // Texte secondaire
-
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({Key? key}) : super(key: key);
-
+class SignInScreen extends StatefulWidget {
   @override
-  _RegisterPageState createState() => _RegisterPageState();
+  _SignInScreenState createState() => _SignInScreenState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
-  final _formKey = GlobalKey<FormState>();
-
-  final TextEditingController nomController = TextEditingController();
-  final TextEditingController prenomController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
+class _SignInScreenState extends State<SignInScreen> {
+  bool _isPasswordVisible = false;
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
-  final TextEditingController autreEmploiController = TextEditingController();
+  final user = FirebaseAuth.instance.currentUser;
 
-  // Valeurs internes, utilisées pour enregistrer dans Firestore
-  String selectedEmploi = "student";
-  String selectedSexe = "male";
-  bool _isPasswordVisible = false;
+  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
 
-  // Méthodes pour récupérer les labels traduits selon la clé
-  String getGenderLabel(String genderKey, AppLocalizations local) {
-    switch (genderKey) {
-      case 'male':
-        return local.male;
-      case 'female':
-        return local.female;
-      default:
-        return '';
+  void handleGoogleSignIn() async {
+    try {
+      final user = await _googleSignIn.signIn();
+      if (user != null) {
+        final userName = user.displayName ?? 'Utilisateur';
+        final userEmail = user.email;
+      }
+    } catch (error) {
+      print('Erreur de connexion Google : $error');
+    }
+  }
+  String hashPassword(String password) {
+    return sha256.convert(utf8.encode(password)).toString();
+  }
+
+  Future<void> sendWelcomeEmailWithSendGrid(String email) async {
+    const String sendGridApiKey = '';
+    const String senderEmail = 'dztrains@gmail.com';
+
+    final url = Uri.parse('https://api.sendgrid.com/v3/mail/send');
+
+    final emailContent = {
+      "personalizations": [
+        {
+          "to": [
+            {"email": email}
+          ],
+          "subject": "Bienvenue sur DzTrain 🚄"
+        }
+      ],
+      "from": {
+        "email": senderEmail,
+        "name": "DzTrain"
+      },
+      "content": [
+        {
+          "type": "text/html",
+          "value": """
+  <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+    <h2 style="color: #1976d2;">Bienvenue à bord de DzTrain 🚆</h2>
+    <p>Bonjour,</p>
+    <p>Merci de vous être inscrit sur <strong>DzTrain</strong> — votre compagnon pour voyager intelligemment à travers le réseau ferroviaire algérien.</p>
+    <p>Avec notre application, vous pouvez :</p>
+    <ul>
+      <li>Rechercher des trajets et visualiser les horaires</li>
+      <li>Suivre les trains en temps réel</li>
+      <li>Recevoir des notifications sur les retards et annulations</li>
+      <li>Discuter avec d'autres voyageurs</li>
+    </ul>
+    <p>Nous sommes ravis de vous compter parmi nous !</p>
+    <hr style="border: none; border-top: 1px solid #ccc;">
+    <p style="font-size: 12px; color: #888;">
+      Cet e-mail vous a été envoyé suite à votre inscription sur DzTrain.<br>
+      Si vous pensez avoir reçu ce message par erreur, veuillez l’ignorer ou contacter notre support.
+    </p>
+  </div>
+"""
+
+        }
+      ]
+    };
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $sendGridApiKey',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(emailContent),
+    );
+
+    if (response.statusCode == 202) {
+      print('✅ Email de bienvenue envoyé à $email');
+    } else {
+      print('❌ Erreur lors de l\'envoi: ${response.statusCode} - ${response.body}');
     }
   }
 
-  String getEmploiLabel(String emploiKey, AppLocalizations local) {
-    switch (emploiKey) {
-      case 'student':
-        return local.student;
-      case 'employee':
-        return local.employee;
-      case 'other':
-        return local.other;
-      default:
-        return '';
+  Future<void> signInWithGoogle(BuildContext context) async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      if (googleUser == null) {
+        Navigator.of(context).pop();
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+
+      if (userCredential.additionalUserInfo!.isNewUser) {
+        print('🆕 Nouvel utilisateur détecté, envoi du mail...');
+        final email = userCredential.user!.email!;
+        await sendWelcomeEmailWithSendGrid(email);
+      } else {
+        print('👤 Utilisateur existant, pas de mail envoyé');
+      }
+
+      final username = userCredential.user?.displayName ?? 'Utilisateur';
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLoggedIn', true);
+      await prefs.setString('username', username);
+
+      Navigator.of(context).pop();
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomePage(username: username),
+        ),
+      );
+    } catch (e) {
+      Navigator.of(context).pop();
+      print("Erreur de connexion Google : $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final local = AppLocalizations.of(context)!;
+    final loc = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: backgroundGradient,
-        ),
-        child: SafeArea(
+    return Theme(
+      data: ThemeData.light(),
+      child: Scaffold(
+        body: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFFA4C6A8),
+                Color(0xFFF4D9DE),
+                Color(0xFFDDD7E8),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 24),
-                  Center(
-                    child: Text(
-                      local.createAccount,
-                      style: const TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF3F51B5), // Indigo
-                      ),
+            child: Column(
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height * 0.23,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/images/signIn.jpg'),
+                      fit: BoxFit.cover,
+                      alignment: Alignment.topCenter,
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Center(
-                    child: Text(
-                      local.welcomeMessage,
-                      style: const TextStyle(fontSize: 16, color: Colors.black54),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  Row(
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(32.0),
+                  child: Column(
                     children: [
-                      Expanded(child: _buildTextField(prenomController, local.firstName)),
-                      const SizedBox(width: 16),
-                      Expanded(child: _buildTextField(nomController, local.lastName)),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(emailController, local.email, isEmail: true),
-                  const SizedBox(height: 16),
-                  _buildDropdown(
-                    local.gender,
-                    selectedSexe,
-                    [
-                      {'value': 'male', 'label': local.male},
-                      {'value': 'female', 'label': local.female},
-                    ],
-                        (val) => setState(() => selectedSexe = val!),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDropdown(
-                    local.jobType,
-                    selectedEmploi,
-                    [
-                      {'value': 'student', 'label': local.student},
-                      {'value': 'employee', 'label': local.employee},
-                      {'value': 'other', 'label': local.other},
-                    ],
-                        (val) => setState(() => selectedEmploi = val!),
-                  ),
-                  if (selectedEmploi == "other")
-                    _buildTextField(autreEmploiController, local.specifyJob),
-                  const SizedBox(height: 16),
-                  _buildTextField(usernameController, local.username),
-                  _buildTextField(passwordController, local.password, isPassword: true),
-                  _buildTextField(confirmPasswordController, local.confirmPassword, isPassword: true, isConfirmPassword: true),
-                  const SizedBox(height: 32),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _register,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.0),
+                      _buildTextField(usernameController, loc.usernameHint, Icons.person),
+                      SizedBox(height: 16.0),
+                      _buildTextField(passwordController, loc.passwordHint, Icons.lock, isPassword: true),
+                      SizedBox(height: 10.0),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
+                            );
+                          },
+                          child: Text(
+                            loc.forgotPassword,
+                            style: TextStyle(color: Colors.black),
+                          ),
                         ),
-                        elevation: 4,
                       ),
-                      child: Text(local.createAccount, style: const TextStyle(fontSize: 16)),
-                    ),
+                      SizedBox(height: 10.0),
+                      ElevatedButton(
+                        onPressed: () async {
+                          final username = usernameController.text.trim();
+                          final password = hashPassword(passwordController.text.trim());
+
+                          try {
+                            QuerySnapshot adminSnapshot = await FirebaseFirestore.instance
+                                .collection('Admin')
+                                .where('Username', isEqualTo: username)
+                                .where('Password', isEqualTo: password)
+                                .get();
+
+                            if (adminSnapshot.docs.isNotEmpty) {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => AdminHomePage(adminUsername: username)),
+                              );
+                              return;
+                            }
+
+                            QuerySnapshot userSnapshot = await FirebaseFirestore.instance
+                                .collection('User')
+                                .where('username', isEqualTo: username)
+                                .where('password', isEqualTo: password)
+                                .get();
+
+                            if (userSnapshot.docs.isNotEmpty) {
+                              await FirebaseFirestore.instance
+                                  .collection('CompteUser')
+                                  .doc(username)
+                                  .set({'loggedIn': true}, SetOptions(merge: true));
+
+                              final prefs = await SharedPreferences.getInstance();
+                              await prefs.setBool('isLoggedIn', true);
+                              await prefs.setString('username', username);
+
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => HomePage(username: username)),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(loc.invalidCredentials)),
+                              );
+                            }
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('${loc.loginError}: $e')),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0x998BB1FF),
+                          padding: EdgeInsets.symmetric(horizontal: 110.0, vertical: 12.0),
+                        ),
+                        child: Text(
+                          loc.signInButton,
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ),
+                      SizedBox(height: 10.0),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) => Center(child: CircularProgressIndicator()),
+                          );
+
+                          await signInWithGoogle(context);
+                        },
+                        icon: FaIcon(FontAwesomeIcons.google, color: Colors.white),
+                        label: Text(
+                          loc.signInGoogle,
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF1E1E1E),
+                          padding: EdgeInsets.symmetric(horizontal: 50.0, vertical: 12.0),
+                        ),
+                      ),
+                      SizedBox(height: 30.0),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => RegisterPage()),
+                          );
+                        },
+                        child: Text(
+                          loc.noAccountSignUp,
+                          style: TextStyle(color: Colors.black87, fontSize: 16),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -167,122 +318,32 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildTextField(
-      TextEditingController controller,
-      String label, {
-        bool isPassword = false,
-        bool isConfirmPassword = false,
-        bool isEmail = false,
-      }) {
-    final local = AppLocalizations.of(context)!;
-
-    return TextFormField(
-      controller: controller,
-      style: const TextStyle(color: textColor),
-      obscureText: isPassword && !_isPasswordVisible,
-      keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: subtitleColor),
-        suffixIcon: isPassword
-            ? IconButton(
-          icon: Icon(
-            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-            color: subtitleColor,
-          ),
-          onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
-        )
-            : null,
-        filled: true,
-        fillColor: cardColor,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0)),
+  Widget _buildTextField(TextEditingController controller, String hintText, IconData icon,
+      {bool isPassword = false}) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.white,
       ),
-      validator: (value) {
-        // ✅ Si ce n'est pas un champ e-mail, il est obligatoire
-        if (!isEmail && (value == null || value.isEmpty)) {
-          return "${local.enter} $label";
-        }
-
-        // ✅ Si c’est un champ e-mail, il peut être vide, mais doit être valide s’il est rempli
-        if (isEmail && value != null && value.isNotEmpty && !value.endsWith("@gmail.com")) {
-          return local.validGmail;
-        }
-
-        if (isPassword && value != null && value.length < 6) {
-          return local.passwordLength;
-        }
-
-        if (isConfirmPassword && value != passwordController.text) {
-          return local.passwordMismatch;
-        }
-
-        return null;
-      },
-    );
-  }
-
-
-  Widget _buildDropdown(String label, String value, List<Map<String, String>> items, ValueChanged<String?> onChanged) {
-    return DropdownButtonFormField<String>(
-      value: value,
-      dropdownColor: Colors.white,
-      style: const TextStyle(color: textColor),
-      items: items
-          .map((item) => DropdownMenuItem(
-        value: item['value'],
-        child: Text(item['label']!, style: const TextStyle(color: textColor)),
-      ))
-          .toList(),
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: subtitleColor),
-        filled: true,
-        fillColor: cardColor,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0)),
+      child: TextField(
+        controller: controller,
+        obscureText: isPassword ? !_isPasswordVisible : false,
+        decoration: InputDecoration(
+          hintText: hintText,
+          border: InputBorder.none,
+          prefixIcon: Icon(icon),
+          suffixIcon: isPassword
+              ? IconButton(
+            icon: Icon(_isPasswordVisible ? Icons.visibility : Icons.visibility_off),
+            onPressed: () {
+              setState(() {
+                _isPasswordVisible = !_isPasswordVisible;
+              });
+            },
+          )
+              : null,
+        ),
       ),
     );
-  }
-
-  String hashPassword(String password) {
-    return sha256.convert(utf8.encode(password)).toString();
-  }
-
-  Future<void> _register() async {
-    final local = AppLocalizations.of(context)!;
-
-    if (_formKey.currentState!.validate()) {
-      try {
-        String username = usernameController.text.trim();
-        String emploiFinal = selectedEmploi == "other" ? autreEmploiController.text.trim() : selectedEmploi;
-
-        await FirebaseFirestore.instance.collection('User').add({
-          'prenom': prenomController.text.trim(),
-          'nom': nomController.text.trim(),
-          'email': emailController.text.trim().isEmpty ? null : emailController.text.trim(),
-          'sexe': selectedSexe,
-          'emploi': emploiFinal,
-          'username': username,
-          'password': hashPassword(passwordController.text.trim()),
-
-        });
-
-        await FirebaseFirestore.instance.collection('CompteUser').doc(username).set({
-          'username': username,
-          'password': hashPassword(passwordController.text.trim()),
-
-          'loggedIn': true,
-        });
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => SuccessPage(username: username)),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("${local.creationError}: $e")),
-        );
-      }
-    }
   }
 }
