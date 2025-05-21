@@ -91,10 +91,7 @@ class _LostObjectFormScreenState extends State<LostObjectFormScreen> {
     final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(loc.lostObjectForm_title),
-        backgroundColor: mainColor,
-      ),
+
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Form(
