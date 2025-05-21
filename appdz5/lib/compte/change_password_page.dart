@@ -18,7 +18,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   final TextEditingController _confirmPasswordController = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  final Color mainColor = const Color(0xFF353C67);
+  final Color mainColor = const Color(0x998BB1FF);
 
   @override
   Widget build(BuildContext context) {
