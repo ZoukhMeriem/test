@@ -18,22 +18,44 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:dztrainfay/locale_provider.dart';
 
+// Définition des couleurs et gradient demandés
+const LinearGradient backgroundGradient = LinearGradient(
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+  colors: [
+    Color(0xFFE3F2FD), // bleu très clair
+    Color(0xFFB3E5FC), // bleu ciel
+    Color(0xFF7986CB), // indigo moyen
+  ],
+);
+
+const Color primaryColor = Color(0xFF7986CB); // Indigo moyen
+const Color cardColor = Colors.white;         // Fond des champs de texte
+const Color textColor = Colors.black87;       // Texte principal
+const Color subtitleColor = Colors.grey;      // Texte secondaire
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialisation Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
   final prefs = await SharedPreferences.getInstance();
+
+  // Chargement des préférences locales
   final bool onboardingSeen = prefs.getBool('onboarding_seen') ?? false;
-  final bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+  final bool isLoggedInPref = prefs.getBool('isLoggedIn') ?? false; // pas utilisé dans ta logique
   final String username = prefs.getString('username') ?? 'Utilisateur';
   final bool isDarkMode = prefs.getBool('isDarkMode') ?? false;
 
   bool loggedIn = false;
-  await prefs.setString('username', username);
-  //await prefs.setBool('isLoggedIn', true);
 
+  // Sauvegarde du username dans prefs (peut-être redondant)
+  await prefs.setString('username', username);
+
+  // Vérification login en base Firestore pour ce username
   if (username.isNotEmpty) {
     final doc = await FirebaseFirestore.instance
         .collection('CompteUser')
@@ -77,6 +99,7 @@ class MyApp extends StatelessWidget {
     Widget startScreen;
     final provider = Provider.of<LocaleProvider>(context);
 
+    // Logique de navigation initiale
     if (!onboardingSeen) {
       startScreen = OnboardingScreen();
     } else if (isLoggedIn) {
@@ -105,22 +128,33 @@ class MyApp extends StatelessWidget {
         return supportedLocales.first;
       },
       theme: ThemeData.light().copyWith(
-        primaryColor: const Color(0xFF353C67),
-        scaffoldBackgroundColor: Colors.grey[100],
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF353C67),
-          foregroundColor: Colors.white,
+        primaryColor: primaryColor,
+        scaffoldBackgroundColor: Colors.white,
+        appBarTheme: AppBarTheme(
+          backgroundColor: primaryColor,
+          foregroundColor: cardColor,
         ),
-        textTheme: const TextTheme(
-          bodyMedium: TextStyle(color: Colors.black87),
+        cardColor: cardColor,
+        textTheme: TextTheme(
+          bodyMedium: TextStyle(color: textColor),
+          bodySmall: TextStyle(color: subtitleColor),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: cardColor,
+          labelStyle: TextStyle(color: textColor),
+          hintStyle: TextStyle(color: subtitleColor),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
         ),
       ),
       darkTheme: ThemeData.dark().copyWith(
-        primaryColor: const Color(0xFF353C67),
+        primaryColor: primaryColor,
         scaffoldBackgroundColor: const Color(0xFF121212),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF353C67),
-          foregroundColor: Colors.white,
+        appBarTheme: AppBarTheme(
+          backgroundColor: primaryColor,
+          foregroundColor: cardColor,
         ),
         cardColor: const Color(0xFF1E1E2E),
         textTheme: const TextTheme(
@@ -138,7 +172,12 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      home: startScreen,
+      home: Container(
+        decoration: const BoxDecoration(
+          gradient: backgroundGradient,
+        ),
+        child: startScreen,
+      ),
       routes: {
         '/login': (context) => SignInScreen(),
         '/signup': (context) => RegisterPage(),
@@ -149,13 +188,14 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// Déconnexion complète et sécurisée
+// Fonction pour déconnexion complète
 Future<void> logout(BuildContext context) async {
   final prefs = await SharedPreferences.getInstance();
   final String username = prefs.getString('username') ?? '';
 
   try {
     if (username.isNotEmpty) {
+      // Met à jour le statut loggedIn dans Firestore
       await FirebaseFirestore.instance
           .collection('CompteUser')
           .doc(username)
@@ -167,16 +207,19 @@ Future<void> logout(BuildContext context) async {
     print("${AppLocalizations.of(context)?.error_prefix ?? '❌ Erreur :'} $e");
   }
 
+  // Nettoyage prefs et déconnexion Firebase et Google
   await prefs.clear();
   await FirebaseAuth.instance.signOut();
   await GoogleSignIn().signOut();
 
+  // Redirection vers l'écran de login en supprimant l'historique de navigation
   Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
 }
 
-// Suppression de compte (optionnelle)
+// Fonction optionnelle pour suppression de compte
 Future<void> deleteAccount(BuildContext context, String userId) async {
   try {
+    // Suppression document utilisateur Firestore
     await FirebaseFirestore.instance.collection('User').doc(userId).delete();
 
     final prefs = await SharedPreferences.getInstance();
