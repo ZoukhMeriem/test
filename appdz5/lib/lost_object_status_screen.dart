@@ -2,12 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class LostObjectStatusScreen extends StatelessWidget {
-  final Color mainColor = const Color(0xFFA4C6A8); // vert doux
-  final Color backgroundColor = const Color(0xFFF4D9DE); // rose pâle
-  final Color cardColor = const Color(0xFFFDFBFD); // blanc léger
-  final Color badgeInProgress = const Color(0xFFDDD7E8); // violet clair
+const LinearGradient backgroundGradient = LinearGradient(
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+  colors: [
+    Color(0xFFF0F4F8), // bleu très clair
+    Color(0xFFD1D9E6), // bleu ciel
+    Color(0xFFA3BED8), // indigo moyen
+  ],
+);
 
+const Color primaryColor = Color(0xFF5677A3); // Indigo moyen
+const Color cardColorConst = Colors.white;    // Fond des champs de texte
+const Color textColor = Colors.black87;       // Texte principal
+const Color subtitleColor = Colors.grey;      // Texte secondaire
+
+class LostObjectStatusScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -19,49 +29,54 @@ class LostObjectStatusScreen extends StatelessWidget {
           loc.lostObjectStatus_title,
           style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
-        backgroundColor: mainColor,
+        backgroundColor: primaryColor,
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 3,
       ),
-      backgroundColor: isDark ? Colors.black : backgroundColor,
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('lost_objects').snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return _buildLoading(loc);
-          }
-          if (snapshot.hasError) {
-            return _buildError(loc, snapshot.error.toString());
-          }
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return _buildEmpty(loc);
-          }
+      // Appliquer le gradient comme fond avec un Container
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: backgroundGradient,
+        ),
+        child: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance.collection('lost_objects').snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return _buildLoading(loc);
+            }
+            if (snapshot.hasError) {
+              return _buildError(loc, snapshot.error.toString());
+            }
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return _buildEmpty(loc);
+            }
 
-          final lostObjects = snapshot.data!.docs;
+            final lostObjects = snapshot.data!.docs;
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(15),
-            itemCount: lostObjects.length,
-            itemBuilder: (context, index) {
-              final data = lostObjects[index].data() as Map<String, dynamic>;
-              final objectName = data['name'] ?? loc.unknown_name;
-              final status = data['status'] ?? 'en cours';
-              final description = data['description'] ?? loc.no_description;
-              final date = data['date'] ?? loc.unknown_date;
-              final imageUrl = data['imageUrl'];
+            return ListView.builder(
+              padding: const EdgeInsets.all(15),
+              itemCount: lostObjects.length,
+              itemBuilder: (context, index) {
+                final data = lostObjects[index].data() as Map<String, dynamic>;
+                final objectName = data['name'] ?? loc.unknown_name;
+                final status = data['status'] ?? 'en cours';
+                final description = data['description'] ?? loc.no_description;
+                final date = data['date'] ?? loc.unknown_date;
+                final imageUrl = data['imageUrl'];
 
-              return _buildLostObjectCard(
-                objectName,
-                description,
-                date,
-                status,
-                imageUrl,
-                loc,
-                isDark,
-              );
-            },
-          );
-        },
+                return _buildLostObjectCard(
+                  objectName,
+                  description,
+                  date,
+                  status,
+                  imageUrl,
+                  loc,
+                  isDark,
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
@@ -79,7 +94,7 @@ class LostObjectStatusScreen extends StatelessWidget {
       elevation: 4,
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      color: isDark ? Colors.grey[850] : cardColor,
+      color: cardColorConst,
       child: Padding(
         padding: const EdgeInsets.all(15),
         child: Row(
@@ -95,7 +110,7 @@ class LostObjectStatusScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : mainColor,
+                      color: primaryColor,
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -105,7 +120,7 @@ class LostObjectStatusScreen extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 14,
-                      color: isDark ? Colors.white70 : Colors.black87,
+                      color: subtitleColor,
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -113,7 +128,7 @@ class LostObjectStatusScreen extends StatelessWidget {
                     '${loc.lostObjectStatus_dateLabel}: $date',
                     style: TextStyle(
                       fontSize: 13,
-                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      color: subtitleColor,
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -162,7 +177,7 @@ class LostObjectStatusScreen extends StatelessWidget {
         displayStatus = loc.status_notFound;
         break;
       default:
-        badgeColor = badgeInProgress;
+        badgeColor = primaryColor.withOpacity(0.5);
         displayStatus = loc.status_inProgress;
     }
 
@@ -197,7 +212,10 @@ class LostObjectStatusScreen extends StatelessWidget {
         children: [
           const CircularProgressIndicator(),
           const SizedBox(height: 12),
-          Text(loc.loading_text),
+          Text(
+            loc.loading_text,
+            style: TextStyle(color: textColor),
+          ),
         ],
       ),
     );
@@ -225,7 +243,7 @@ class LostObjectStatusScreen extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             loc.lostObjectStatus_noObjects,
-            style: const TextStyle(fontSize: 16, color: Colors.grey),
+            style: TextStyle(fontSize: 16, color: subtitleColor),
           ),
         ],
       ),
