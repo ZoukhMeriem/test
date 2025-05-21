@@ -1,6 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+const LinearGradient backgroundGradient = LinearGradient(
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+  colors: [
+    Color(0xFFA3BED8), // bleu-gris moyen clair
+    Color(0xFFD1D9E6), // gris bleu clair
+    Color(0xFFF0F4F8), // blanc cassé très clair
+  ],
+);
+
+const Color primaryColor = Color(0xFF7986CB); // Indigo moyen (tu peux changer si tu veux une couleur assortie)
+const Color cardColor = Colors.white;         // Fond des champs de texte
+const Color textColor = Colors.black87;       // Texte principal
+const Color subtitleColor = Colors.grey;      // Texte secondaire
+
 class CustomBottomNavBar extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onItemTapped;
@@ -47,15 +62,7 @@ class CustomBottomNavBar extends StatelessWidget {
         Container(
           height: 70,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFFA4C6A8),
-                Color(0xFFF4D9DE),
-                Color(0xFFDDD7E8),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            gradient: backgroundGradient,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(22),
               topRight: Radius.circular(22),
@@ -82,15 +89,14 @@ class CustomBottomNavBar extends StatelessWidget {
                     children: [
                       Icon(
                         icons[index],
-                        color: isSelected ? Color(0xFF0C3243) : Color(0xFF1E1E1E),
+                        color: isSelected ? primaryColor : textColor,
                         size: isSelected ? 30 : 26,
                       ),
                       const SizedBox(height: 4),
                       Text(
                         labels[index],
                         style: TextStyle(
-                          color:
-                          isSelected ? Color(0xFF0C3243) : Color(0xFF1E1E1E),
+                          color: isSelected ? primaryColor : subtitleColor,
                           fontWeight:
                           isSelected ? FontWeight.bold : FontWeight.normal,
                           fontSize: 12,
@@ -112,7 +118,7 @@ class CustomBottomNavBar extends StatelessWidget {
             height: 48,
             width: 48,
             decoration: BoxDecoration(
-              color: Color(0x292799FF), // Bulle légère bleu clair
+              color: primaryColor.withOpacity(0.16), // bulle légère indigo clair
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
