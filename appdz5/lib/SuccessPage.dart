@@ -1,6 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Ajouté
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'HomePage.dart';
+
+// Tes couleurs fournies
+const LinearGradient backgroundGradient = LinearGradient(
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+  colors: [
+    Color(0xFFF0F4F8),
+    Color(0xFFD1D9E6),
+    Color(0xFFA3BED8),
+  ],
+);
+
+const Color primaryColor =  Color(0xFF5677A3); // Indigo moyen
+const Color cardColor = Colors.white; // Fond des champs de texte
+const Color textColor = Colors.black87; // Texte principal
+const Color subtitleColor = Colors.grey; // Texte secondaire
 
 class SuccessPage extends StatelessWidget {
   final String username;
@@ -15,25 +31,17 @@ class SuccessPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           local.successTitle,
-          style: const TextStyle(fontSize: 24, color: Colors.black87),
+          style: TextStyle(fontSize: 24, color: textColor),
         ),
-        backgroundColor: const Color(0x998BB1FF),
+        backgroundColor: primaryColor,
         elevation: 0,
       ),
       body: Container(
+        decoration: BoxDecoration(
+          gradient: backgroundGradient,
+        ),
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0x998BB1FF),
-              Color(0xFFF4D9DE),
-              Color(0xFFDDD7E8),
-            ],
-          ),
-        ),
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(24.0),
@@ -48,17 +56,20 @@ class SuccessPage extends StatelessWidget {
                 const SizedBox(height: 30),
                 Text(
                   local.accountCreated,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: textColor,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
                 Text(
                   local.welcomeMessage,
-                  style: const TextStyle(fontSize: 16, color: Colors.black87),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: subtitleColor,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 40),
@@ -74,11 +85,13 @@ class SuccessPage extends StatelessWidget {
                   label: Text(
                     local.loginButton,
                     style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0x998BB1FF),
-                    foregroundColor: Colors.black87,
+                    backgroundColor: primaryColor,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 40, vertical: 14),
                     shape: RoundedRectangleBorder(
