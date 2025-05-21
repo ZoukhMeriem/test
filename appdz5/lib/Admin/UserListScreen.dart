@@ -140,9 +140,10 @@ class UserDetailsScreen extends StatelessWidget {
             infoTile("Username", data['username'] ?? '', Icons.account_circle),
             infoTile("Sexe", data['sexe'] ?? '', Icons.wc),
             infoTile("Emploi", data['emploi'] ?? '', Icons.work),
-            infoTile("Mot de passe", user['password'] ?? '', Icons.lock_outline),
+            infoTile("Mot de passe", "••••••••", Icons.lock_outline),
 
-            SizedBox(height: 30),
+
+          SizedBox(height: 30),
 
             Center(
               child: ElevatedButton.icon(
