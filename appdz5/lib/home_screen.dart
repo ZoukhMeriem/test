@@ -4,16 +4,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'liste_trajets_screen.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 
 class HomeScreen extends StatefulWidget {
   @override
+  final String? message;
+  const HomeScreen({Key? key, this.message}) : super(key: key);
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
   GoogleMapController? _mapController;
+  bool showMessage = false;
+
   Position? _currentPosition;
   LatLng _initialPosition = LatLng(36.7372, 3.0863);
   Set<Marker> _markers = {};
@@ -42,16 +44,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
   // ✅ Stocke les lignes de chaque gare
 
-  void _onSearch(BuildContext context) {
+  void _onSearch() {
     // Logique de recherche ici
     // ... (votre logique de recherche)
 
-    // Afficher le message après la recherche avec localisation
+    // Afficher le message après la recherche
     setState(() {
-      _searchMessage = AppLocalizations.of(context)!.viewRoutesMessage;
+      _searchMessage = "Consulter les trajets de votre voyage";
     });
   }
-
 
   @override
 
@@ -63,6 +64,14 @@ class _HomeScreenState extends State<HomeScreen> {
     _filteredDestinationStations = _stations.keys.toList();
     _filteredDepartureStations = _stations.keys.toList();
 
+    if (widget.message != null) {
+      showMessage = true;
+      Future.delayed(const Duration(seconds: 15), () {
+        setState(() {
+          showMessage = false;
+        });
+      });
+    }
   }
 
   Future<void> _getCurrentLocation() async {
@@ -88,10 +97,9 @@ class _HomeScreenState extends State<HomeScreen> {
       _mapController?.animateCamera(CameraUpdate.newLatLngZoom(_initialPosition, 14));
       _showNearestStationsDialog();
     } catch (e) {
-      print("${AppLocalizations.of(context)!.locationErrorMessage}: $e");
+      print("Erreur lors de la récupération de la position : $e");
     }
   }
-
 
   Future<void> _fetchStationsFromFirestore() async {
     try {
@@ -104,8 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Map<String, LatLng> stations = {};
       Map<String, List<String>> stationLines = {};
 
-      print("${AppLocalizations.of(context)!.allFirestoreStations}");
-
+      print("📌 Toutes les gares Firestore :");
       for (var doc in querySnapshot.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         int stationId = data['id'];
@@ -187,12 +194,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<MapEntry<String, double>> _findNearestStations() {
     if (_currentPosition == null) {
-      print(AppLocalizations.of(context)!.currentPositionNotDefinedWarning);
+      print("⚠️ Position actuelle non définie !");
       return [];
     }
 
     if (_stations.isEmpty) {
-      print(AppLocalizations.of(context)!.noStationsAvailableWarning);
+      print("⚠️ Aucune gare disponible !");
       return [];
     }
 
@@ -200,13 +207,12 @@ class _HomeScreenState extends State<HomeScreen> {
       _currentPosition!.latitude,
       _currentPosition!.longitude,
     );
-    print("${AppLocalizations.of(context)!.currentLocationMessage}: $userPosition");
-
+    print("📍 Position actuelle : $userPosition");
 
     // Calculer la distance pour chaque station
     List<MapEntry<String, double>> stationDistances = _stations.entries.map((entry) {
       double distance = _calculateDistance(userPosition, entry.value);
-      print(AppLocalizations.of(context)!.stationDistanceFromUser(entry.key, distance.toStringAsFixed(2)));
+      print("📌 Distance entre ${entry.key} et utilisateur: ${distance.toStringAsFixed(2)}m");
       return MapEntry(entry.key, distance);
     }).toList();
 
@@ -216,8 +222,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Retourner les 3 gares les plus proches
     List<MapEntry<String, double>> nearest = stationDistances.take(3).toList();
 
-    final List<String> stationList = nearest.map((e) => '${e.key} (${e.value.toStringAsFixed(2)}m)').toList();
-    print(AppLocalizations.of(context)!.nearest3Stations(stationList.join(", ")));
+    print("✅ 3 gares les plus proches : ${nearest.map((e) => '${e.key} (${e.value.toStringAsFixed(2)}m)').toList()}");
 
     return nearest;
   }
@@ -226,18 +231,16 @@ class _HomeScreenState extends State<HomeScreen> {
     List<MapEntry<String, double>> nearestStations = _findNearestStations();
 
     if (nearestStations.isEmpty) {
-      print(AppLocalizations.of(context)!.noNearbyStation);
+      print("⚠️ Aucune gare proche trouvée !");
       return;
     }
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        final loc = AppLocalizations.of(context)!;
-
         return AlertDialog(
           title: Text(
-            loc.nearestStations,
+            'Gares les plus proches',
             style: TextStyle(
               color: Theme.of(context).brightness == Brightness.dark
                   ? Colors.white
@@ -251,9 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: nearestStations.map((station) {
               return ListTile(
                 title: Text(station.key),
-                subtitle: Text(
-                  loc.stationDistance(station.value.toStringAsFixed(2)),
-                ),
+                subtitle: Text("Distance: ${station.value.toStringAsFixed(2)} m"),
                 onTap: () {
                   final selectedStation = station.key;
 
@@ -262,25 +263,26 @@ class _HomeScreenState extends State<HomeScreen> {
                     _selectedDeparturePosition = _stations[selectedStation];
                     _useCurrentLocationAsDeparture = false;
 
-                    // Met à jour le champ de recherche avec le nom de la gare choisie
+                    // 👉 Met à jour le champ de recherche avec le nom de la gare choisie
                     _departureSearchController.text = selectedStation;
 
-                    // Nettoie la destination et les anciens marqueurs/polylines
+                    // 👉 Nettoie la destination et les anciens marqueurs/polylines
                     _selectedDestination = null;
                     _selectedDestinationPosition = null;
                     _polylines.clear();
                     _markers.clear();
 
-                    // Ajoute le marqueur vert pour le départ
+                    // 👉 Ajoute le marqueur vert pour le départ
                     _addMarker(selectedStation, _stations[selectedStation]!, true);
 
-                    // Zoom automatique
+                    // 👉 Zoom automatique
                     zoomToSelectedLocations();
                   });
 
-                  // Ferme la boîte de dialogue après sélection
+                  // 👉 Ferme la boîte de dialogue après sélection
                   Navigator.pop(context);
                 },
+
               );
             }).toList(),
           ),
@@ -294,11 +296,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Marker(
         markerId: MarkerId(name),
         position: position,
-        infoWindow: InfoWindow(
-          title: isDepart
-              ? "${AppLocalizations.of(context)!.departureMarker}: $name"
-              : "${AppLocalizations.of(context)!.destinationMarker}: $name",
-        ),
+        infoWindow: InfoWindow(title: isDepart ? "🚆 Départ: $name" : "🏁 Destination: $name"),
         icon: BitmapDescriptor.defaultMarkerWithHue(
           isDepart ? BitmapDescriptor.hueGreen : BitmapDescriptor.hueBlue,
         ),
@@ -324,22 +322,16 @@ class _HomeScreenState extends State<HomeScreen> {
       _markers.add(Marker(
         markerId: MarkerId(_selectedDeparture!),
         position: start,
-        infoWindow: InfoWindow(
-          title: "${AppLocalizations.of(context)!.departureMarker}: $_selectedDeparture",
-        ),
+        infoWindow: InfoWindow(title: "🚆 Départ: $_selectedDeparture"),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
       ));
-
 
       _markers.add(Marker(
         markerId: MarkerId(_selectedDestination!),
         position: end,
-        infoWindow: InfoWindow(
-          title: "${AppLocalizations.of(context)!.destinationMarker}: $_selectedDestination",
-        ),
+        infoWindow: InfoWindow(title: "🏁 Destination: $_selectedDestination"),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
       ));
-
 
 
     });
@@ -364,10 +356,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (startIndex == -1 || endIndex == -1 || startIndex == endIndex) {
-      print(AppLocalizations.of(context)!.errorCannotFindStartOrDestination);
+      print("🚨 Erreur : Impossible de trouver le départ ou la destination !");
       return [];
     }
-
 
     List<String> intermediateStations;
 
@@ -385,9 +376,8 @@ class _HomeScreenState extends State<HomeScreen> {
           .toList();
     }
 
-    print("${AppLocalizations.of(context)!.intermediateStationsDetected} : $intermediateStations");
+    print("✅ Gares intermédiaires détectées : $intermediateStations");
     return intermediateStations;
-
   }
 
   Future<void> testFetchBoufarik() async {
@@ -437,26 +427,19 @@ class _HomeScreenState extends State<HomeScreen> {
           Marker(
             markerId: MarkerId(_selectedDeparture!),
             position: depart,
-            infoWindow: InfoWindow(
-              title: "${AppLocalizations.of(context)!.departure} : $_selectedDeparture",
-            ),
+            infoWindow: InfoWindow(title: "🚆 Départ: $_selectedDeparture"),
             icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
           ),
         );
-
-
 
         _markers.add(
           Marker(
             markerId: MarkerId(_selectedDestination!),
             position: destination,
-            infoWindow: InfoWindow(
-              title: "${AppLocalizations.of(context)!.destinationMarker} : $_selectedDestination",
-            ),
+            infoWindow: InfoWindow(title: "🏁 Destination: $_selectedDestination"),
             icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
           ),
         );
-
       });
 
       List<String> intermediateStations = await getIntermediateStations(_selectedDeparture!, _selectedDestination!);
@@ -468,15 +451,13 @@ class _HomeScreenState extends State<HomeScreen> {
               Marker(
                 markerId: MarkerId(stationName),
                 position: _stations[stationName]!,
-                infoWindow: InfoWindow(
-                  title: "${AppLocalizations.of(context)!.intermediateStop}: $stationName",
-                ),
+                infoWindow: InfoWindow(title: "🚉 Arrêt intermédiaire: $stationName"),
                 icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
               ),
             );
-            print("${AppLocalizations.of(context)!.markerAddedFor} $stationName");
+            print("📍 Marqueur ajouté pour : $stationName");
           } else {
-            print("${AppLocalizations.of(context)!.intermediateStationNotFound} $stationName");
+            print("⚠️ La gare intermédiaire $stationName n'existe pas dans _stations !");
           }
         }
       });
@@ -534,7 +515,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (!_showGareList) ...[
                         ListTile(
                           leading: Icon(Icons.my_location, color: Colors.green),
-                          title: Text(AppLocalizations.of(context)!.useCurrentLocation),
+                          title: Text("📍 Utiliser ma position actuelle"),
                           onTap: () async {
                             Navigator.pop(context);
                             Position position = await Geolocator.getCurrentPosition();
@@ -554,13 +535,13 @@ class _HomeScreenState extends State<HomeScreen> {
                               _updateMarkers();
                               zoomToSelectedLocations();
                             } else {
-                              print(AppLocalizations.of(context)!.noNearbyStationsWarning);
+                              print("⚠️ Aucune gare trouvée à proximité !");
                             }
                           },
                         ),
                         ListTile(
                           leading: Icon(Icons.train, color: Colors.blueGrey),
-                          title: Text(AppLocalizations.of(context)!.chooseStationTitle),
+                          title: Text("🚉 Choisir une gare"),
                           onTap: () {
                             setModalState(() {
                               _showGareList = true;
@@ -570,7 +551,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                         ),
                       ] else ...[
-                        Text(AppLocalizations.of(context)!.chooseStationTitle, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text("🚉 Choisir une gare", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                         SizedBox(height: 10),
                         TextField(
                           controller: _departureSearchController,
@@ -580,7 +561,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 : Colors.black,
                           ),
                           decoration: InputDecoration(
-                            hintText: AppLocalizations.of(context)!.searchStationHint,
+                            hintText: "Rechercher une gare...",
                             hintStyle: TextStyle(
                               color: Theme.of(context).brightness == Brightness.dark
                                   ? Colors.white54
@@ -689,10 +670,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     children: [
                       Text(
-                        AppLocalizations.of(context)!.chooseDestinationStation,
+                        "🚉 Choisir une gare de destination",
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-
                       SizedBox(height: 10),
                       TextField(
                         controller: _departureSearchController,
@@ -702,8 +682,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               : Colors.black,
                         ),
                         decoration: InputDecoration(
-                          hintText: AppLocalizations.of(context)!.searchStationHint,
-
+                          hintText: "Rechercher une gare...",
                           hintStyle: TextStyle(
                             color: Theme.of(context).brightness == Brightness.dark
                                 ? Colors.white54
@@ -817,9 +796,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Marker(
           markerId: MarkerId(_selectedDeparture!),
           position: start,
-          infoWindow: InfoWindow(
-              title: "${AppLocalizations.of(context)!.departureStation}: $_selectedDeparture"
-          ),
+          infoWindow: InfoWindow(title: "🚆 Départ: $_selectedDeparture"),
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
         ),
       );
@@ -832,9 +809,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Marker(
               markerId: MarkerId(station),
               position: _stations[station]!,
-              infoWindow: InfoWindow(
-                  title: "${AppLocalizations.of(context)!.intermediateStop}: $station"
-              ),
+              infoWindow: InfoWindow(title: "🚉 Arrêt intermédiaire: $station"),
               icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
             ),
           );
@@ -846,9 +821,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Marker(
           markerId: MarkerId(_selectedDestination!),
           position: end,
-          infoWindow: InfoWindow(
-              title: "${AppLocalizations.of(context)!.destinationMarker}: $_selectedDestination"
-          ),
+          infoWindow: InfoWindow(title: "🏁 Destination: $_selectedDestination"),
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
         ),
       );
@@ -865,21 +838,20 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     });
 
-    print(AppLocalizations.of(context)!.routeUpdatedMessage(routePoints.length));
+    print("✅ Route mise à jour avec ${routePoints.length} points !");
   }
 
   bool _areStationsOnSameLine(String departure, String destination) {
     List<String>? departureLines = _stationLines[departure];
     List<String>? destinationLines = _stationLines[destination];
 
-    print(AppLocalizations.of(context)!.departureMessage(departure, departureLines?.join(', ') ?? ''));
-    print(AppLocalizations.of(context)!.destinationMessage(destination, destinationLines?.join(', ') ?? ''));
-
+    print("🚆 Départ: $departure (${departureLines?.join(', ')})");
+    print("🚆 Destination: $destination (${destinationLines?.join(', ')})");
 
     if (departureLines == null || destinationLines == null) return false;
 
     bool result = departureLines.any((line) => destinationLines.contains(line));
-    print(AppLocalizations.of(context)!.sameLineResult(result.toString()));
+    print("✅ Les deux gares sont sur la même ligne ? $result");
     return result;
   }
 
@@ -893,18 +865,17 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.impossiblePathTitle),
-          content: Text(AppLocalizations.of(context)!.impossiblePathContent),
+          title: Text("🚨 Chemin impossible"),
+          content: Text("Les gares sélectionnées appartiennent à des lignes différentes."),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(AppLocalizations.of(context)!.okButton),
+              child: Text("OK"),
             ),
           ],
         );
       },
     );
-
   }
 
   Future<void> _selectDateTime(BuildContext context) async {
@@ -980,10 +951,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    AppLocalizations.of(context)!.whereDoYouWantToGoToday,
+                    "Où souhaitez-vous aller aujourd'hui?",
+
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-
                   SizedBox(height: 10),
                   InkWell(
                     onTap: _showDepartureChoiceModal,
@@ -1000,11 +971,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           Expanded(
                             child: Text(
                               _useCurrentLocationAsDeparture
-                                  ? AppLocalizations.of(context)!.myCurrentLocation
-                                  : (_selectedDeparture ?? AppLocalizations.of(context)!.chooseDeparturePoint),
+                                  ? "📍 Ma position actuelle"
+                                  : (_selectedDeparture ?? "🏠 Choisir un point de départ"),
                               style: TextStyle(fontSize: 16),
                             ),
-
                           ),
                           Icon(Icons.arrow_drop_down),
                         ],
@@ -1025,10 +995,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              _selectedDestination ?? AppLocalizations.of(context)!.chooseDestinationStation,
+                              _selectedDestination ?? "🚉 Choisir une gare de destination",
                               style: TextStyle(fontSize: 16),
                             ),
-
                           ),
                           Icon(Icons.arrow_drop_down),
                         ],
@@ -1045,10 +1014,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         Text(
                           _selectedDate != null
                               ? DateFormat('dd/MM/yyyy HH:mm').format(_selectedDate!)
-                              : AppLocalizations.of(context)!.chooseDateTime,
+                              : "📅 Choisir une date et heure",
                           style: TextStyle(fontSize: 16),
                         ),
-
                       ],
                     ),
                   ),
@@ -1057,9 +1025,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
-                        _searchMessage = AppLocalizations.of(context)!.consultTravelRoutes;
+                        _searchMessage = "Consulter les trajets de votre voyage"; // Met à jour le message après la recherche
                       });
-
                       _updateMarkers(); // Met à jour les marqueurs après sélection
                       drawRouteWithIntermediateStations(); // 👈 ajouter ceci
                       zoomToSelectedLocations();
@@ -1071,7 +1038,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     child: Center(
                       child: Text(
-                        AppLocalizations.of(context)!.search,
+                        "Rechercher",
                         style: TextStyle(
                           fontSize: 18,
                           color: Theme.of(context).brightness == Brightness.dark
@@ -1079,7 +1046,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               : Color(0xFF1E1E1E),
                         ),
                       ),
-
                     ),
 
                   ),
@@ -1093,16 +1059,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             _rechercherTrajets(context, _selectedDeparture!, _selectedDestination!, _selectedDate!);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(AppLocalizations.of(context)!.chooseDepartureDestinationDate)),
+                                SnackBar(content: Text("Veuillez choisir un départ, une destination et une date"))
                             );
-
                           }
                         },
                         icon: Icon(Icons.directions_transit,  color: Color(0xFF1E1E1E)),
-                        label: Text(
-                          AppLocalizations.of(context)!.consultTrips,
-                          style: TextStyle(fontSize: 18, color: Color(0xFF1E1E1E)),
-                        ),
+                        label: Text("Consulter les trajets",style: TextStyle(fontSize: 18, color: Color(0xFF1E1E1E))),
                         style: ElevatedButton.styleFrom(
                           backgroundColor:  Color(0xFFCCE3F8),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -1117,6 +1079,24 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
+
+          if (showMessage && widget.message != null)
+            Positioned(
+              top: 40,
+              left: 12,
+              right: 12,
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blueAccent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  widget.message!,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
         ],
       ),
     );
