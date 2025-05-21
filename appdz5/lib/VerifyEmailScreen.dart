@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'CreatePasswordScreen.dart';
@@ -16,6 +17,37 @@ class VerifyEmailScreen extends StatefulWidget {
 class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   final TextEditingController codeController = TextEditingController();
   bool isLoading = false;
+
+  String fullMessage = "📧 Si vous n'avez rien reçu, veuillez vérifier vos spams.";
+  String displayedMessage = "";
+  int _charIndex = 0;
+  Timer? _typingTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    startTypingEffect();
+  }
+
+  void startTypingEffect() {
+    _typingTimer = Timer.periodic(Duration(milliseconds: 50), (timer) {
+      if (_charIndex < fullMessage.length) {
+        setState(() {
+          displayedMessage += fullMessage[_charIndex];
+          _charIndex++;
+        });
+      } else {
+        _typingTimer?.cancel();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _typingTimer?.cancel();
+    codeController.dispose();
+    super.dispose();
+  }
 
   Future<void> verifyCode() async {
     setState(() {
@@ -50,7 +82,9 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("${AppLocalizations.of(context)!.error} : ${e.toString()}")),
+        SnackBar(
+            content: Text(
+                "${AppLocalizations.of(context)!.error} : ${e.toString()}")),
       );
     } finally {
       setState(() {
@@ -91,7 +125,8 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
           child: Column(
             children: [
               const SizedBox(height: 50),
-              const Icon(Icons.verified_user_rounded, size: 80, color: Colors.black87),
+              const Icon(Icons.verified_user_rounded,
+                  size: 80, color: Colors.black87),
               const SizedBox(height: 20),
               Text(
                 local.verifyYourEmail,
@@ -149,17 +184,29 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                 icon: const Icon(Icons.verified, color: Colors.white),
                 label: Text(
                   local.verify,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0x998BB1FF),
                   foregroundColor: Colors.black87,
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 40, vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   elevation: 5,
                 ),
+              ),
+              const SizedBox(height: 30),
+              Text(
+                displayedMessage,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
