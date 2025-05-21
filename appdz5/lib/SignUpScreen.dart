@@ -167,8 +167,13 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label,
-      {bool isPassword = false, bool isConfirmPassword = false, bool isEmail = false}) {
+  Widget _buildTextField(
+      TextEditingController controller,
+      String label, {
+        bool isPassword = false,
+        bool isConfirmPassword = false,
+        bool isEmail = false,
+      }) {
     final local = AppLocalizations.of(context)!;
 
     return TextFormField(
@@ -193,22 +198,29 @@ class _RegisterPageState extends State<RegisterPage> {
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0)),
       ),
       validator: (value) {
-        if (value == null || value.isEmpty) {
+        // ✅ Si ce n'est pas un champ e-mail, il est obligatoire
+        if (!isEmail && (value == null || value.isEmpty)) {
           return "${local.enter} $label";
         }
-        if (isEmail && !value.endsWith("@gmail.com")) {
+
+        // ✅ Si c’est un champ e-mail, il peut être vide, mais doit être valide s’il est rempli
+        if (isEmail && value != null && value.isNotEmpty && !value.endsWith("@gmail.com")) {
           return local.validGmail;
         }
-        if (isPassword && value.length < 6) {
+
+        if (isPassword && value != null && value.length < 6) {
           return local.passwordLength;
         }
+
         if (isConfirmPassword && value != passwordController.text) {
           return local.passwordMismatch;
         }
+
         return null;
       },
     );
   }
+
 
   Widget _buildDropdown(String label, String value, List<Map<String, String>> items, ValueChanged<String?> onChanged) {
     return DropdownButtonFormField<String>(
@@ -247,7 +259,7 @@ class _RegisterPageState extends State<RegisterPage> {
         await FirebaseFirestore.instance.collection('User').add({
           'prenom': prenomController.text.trim(),
           'nom': nomController.text.trim(),
-          'email': emailController.text.trim(),
+          'email': emailController.text.trim().isEmpty ? null : emailController.text.trim(),
           'sexe': selectedSexe,
           'emploi': emploiFinal,
           'username': username,
