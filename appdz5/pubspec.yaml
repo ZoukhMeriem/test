@@ -20,6 +20,7 @@ dependencies:
   flutter_rating_bar: ^4.0.0
   pie_chart: ^5.3.2
   percent_indicator: ^4.2.5
+  crypto: ^3.0.3
   # Local storage
   shared_preferences: ^2.2.2
   uuid: ^4.0.0
