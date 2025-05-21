@@ -216,13 +216,14 @@ class _SignInScreenState extends State<SignInScreen> {
                       ElevatedButton(
                         onPressed: () async {
                           final username = usernameController.text.trim();
-                          final password = hashPassword(passwordController.text.trim());
+                          final rawPassword = passwordController.text.trim();
+                          final hashedPassword = hashPassword(rawPassword);
 
                           try {
                             QuerySnapshot adminSnapshot = await FirebaseFirestore.instance
                                 .collection('Admin')
                                 .where('Username', isEqualTo: username)
-                                .where('Password', isEqualTo: password)
+                                .where('Password', isEqualTo: rawPassword) // sans hachage ici
                                 .get();
 
                             if (adminSnapshot.docs.isNotEmpty) {
@@ -236,8 +237,9 @@ class _SignInScreenState extends State<SignInScreen> {
                             QuerySnapshot userSnapshot = await FirebaseFirestore.instance
                                 .collection('User')
                                 .where('username', isEqualTo: username)
-                                .where('password', isEqualTo: password)
+                                .where('password', isEqualTo: hashedPassword)
                                 .get();
+
 
                             if (userSnapshot.docs.isNotEmpty) {
                               await FirebaseFirestore.instance
