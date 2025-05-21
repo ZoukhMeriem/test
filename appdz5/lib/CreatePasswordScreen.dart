@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'PasswordChangedScreen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
 
 class CreatePasswordScreen extends StatefulWidget {
   final String email;
@@ -15,6 +17,9 @@ class CreatePasswordScreen extends StatefulWidget {
 class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
   final TextEditingController passwordController = TextEditingController();
   bool isLoading = false;
+  String hashPassword(String password) {
+    return sha256.convert(utf8.encode(password)).toString();
+  }
 
   Future<void> updatePassword() async {
     setState(() {
@@ -45,7 +50,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
 
       if (snapshot.docs.isNotEmpty) {
         await snapshot.docs.first.reference.set({
-          'password': nouveauMotDePasse,
+          'password': hashPassword(nouveauMotDePasse),
         }, SetOptions(merge: true));
 
         ScaffoldMessenger.of(context).showSnackBar(
