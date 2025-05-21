@@ -11,8 +11,6 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Admin/AdminHomePage.dart';
-
-// Import localisation
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -49,43 +47,15 @@ class _SignInScreenState extends State<SignInScreen> {
     final emailContent = {
       "personalizations": [
         {
-          "to": [
-            {"email": email}
-          ],
+          "to": [{"email": email}],
           "subject": "Bienvenue sur DzTrain 🚄"
         }
       ],
-      "from": {
-        "email": senderEmail,
-        "name": "DzTrain"
-      },
+      "from": {"email": senderEmail, "name": "DzTrain"},
       "content": [
         {
           "type": "text/html",
-          "value": """
-  <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
-    <h2 style="color: #1976d2;">Bienvenue à bord de DzTrain 🚆</h2>
-    <p>Bonjour,</p>
-    <p>Merci de vous être inscrit sur <strong>DzTrain</strong> — votre compagnon pour voyager intelligemment à travers le réseau ferroviaire algérien.</p>
-    <p>Avec notre application, vous pouvez :</p>
-    <ul>
-      <li>Rechercher des trajets et visualiser les horaires</li>
-      <li>Suivre les trains en temps réel</li>
-      <li>Recevoir des notifications sur les retards et annulations</li>
-      <li>Discuter avec d'autres voyageurs</li>
-    </ul>
-    <p>Nous sommes ravis de vous compter parmi nous !</p>
-    <p>
-   👉 <a href="https://dztrain.com" style="color: #1976d2;">Découvrir l’application DzTrain</a>
-    </p>
-    <hr style="border: none; border-top: 1px solid #ccc;">
-    <p style="font-size: 12px; color: #888;">
-      Cet e-mail vous a été envoyé suite à votre inscription sur DzTrain.<br>
-      Si vous pensez avoir reçu ce message par erreur, veuillez l’ignorer ou contacter notre support.
-    </p>
-  </div>
-"""
-
+          "value": """<p>Bienvenue sur DzTrain !</p>"""
         }
       ]
     };
@@ -115,31 +85,29 @@ class _SignInScreenState extends State<SignInScreen> {
         return;
       }
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+      await googleUser.authentication;
 
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      final userCredential =
+      await FirebaseAuth.instance.signInWithCredential(credential);
 
       if (userCredential.additionalUserInfo!.isNewUser) {
         print('🆕 Nouvel utilisateur détecté, envoi du mail...');
         final email = userCredential.user!.email!;
         await sendWelcomeEmailWithSendGrid(email);
-      } else {
-        print('👤 Utilisateur existant, pas de mail envoyé');
       }
 
       final username = userCredential.user?.displayName ?? 'Utilisateur';
-
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', true);
       await prefs.setString('username', username);
 
       Navigator.of(context).pop();
-
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -165,9 +133,9 @@ class _SignInScreenState extends State<SignInScreen> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color(0xFFA4C6A8),
-                Color(0xFFF4D9DE),
-                Color(0xFFDDD7E8),
+                Color(0xFFA3BED8), // bleu-gris moyen clair
+                Color(0xFFD1D9E6), // gris bleu clair
+                Color(0xFFF0F4F8), // blanc cassé clair
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -178,7 +146,7 @@ class _SignInScreenState extends State<SignInScreen> {
               children: [
                 Container(
                   width: double.infinity,
-                  height: MediaQuery.of(context).size.height * 0.23,
+                  height: MediaQuery.of(context).size.height * 0.25,
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       image: AssetImage('assets/images/signIn.jpg'),
@@ -188,13 +156,13 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(32.0),
+                  padding: const EdgeInsets.all(28.0),
                   child: Column(
                     children: [
                       _buildTextField(usernameController, loc.usernameHint, Icons.person),
-                      SizedBox(height: 16.0),
+                      SizedBox(height: 16),
                       _buildTextField(passwordController, loc.passwordHint, Icons.lock, isPassword: true),
-                      SizedBox(height: 10.0),
+                      SizedBox(height: 10),
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
@@ -204,13 +172,10 @@ class _SignInScreenState extends State<SignInScreen> {
                               MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
                             );
                           },
-                          child: Text(
-                            loc.forgotPassword,
-                            style: TextStyle(color: Colors.black),
-                          ),
+                          child: Text(loc.forgotPassword, style: TextStyle(color: Colors.black87)),
                         ),
                       ),
-                      SizedBox(height: 10.0),
+                      SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () async {
                           final username = usernameController.text.trim();
@@ -226,7 +191,8 @@ class _SignInScreenState extends State<SignInScreen> {
                             if (adminSnapshot.docs.isNotEmpty) {
                               Navigator.pushReplacement(
                                 context,
-                                MaterialPageRoute(builder: (context) => AdminHomePage(adminUsername: username)),
+                                MaterialPageRoute(
+                                    builder: (context) => AdminHomePage(adminUsername: username)),
                               );
                               return;
                             }
@@ -249,7 +215,8 @@ class _SignInScreenState extends State<SignInScreen> {
 
                               Navigator.pushReplacement(
                                 context,
-                                MaterialPageRoute(builder: (context) => HomePage(username: username)),
+                                MaterialPageRoute(
+                                    builder: (context) => HomePage(username: username)),
                               );
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -263,15 +230,13 @@ class _SignInScreenState extends State<SignInScreen> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0x998BB1FF),
-                          padding: EdgeInsets.symmetric(horizontal: 110.0, vertical: 12.0),
+                          backgroundColor: Color(0xFF5677A3), // bleu moyen pro
+                          padding: EdgeInsets.symmetric(horizontal: 100.0, vertical: 12.0),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                         ),
-                        child: Text(
-                          loc.signInButton,
-                          style: TextStyle(fontSize: 16, color: Colors.white),
-                        ),
+                        child: Text(loc.signInButton, style: TextStyle(fontSize: 16, color: Colors.white)),
                       ),
-                      SizedBox(height: 10.0),
+                      SizedBox(height: 10),
                       ElevatedButton.icon(
                         onPressed: () async {
                           showDialog(
@@ -283,16 +248,15 @@ class _SignInScreenState extends State<SignInScreen> {
                           await signInWithGoogle(context);
                         },
                         icon: FaIcon(FontAwesomeIcons.google, color: Colors.white),
-                        label: Text(
-                          loc.signInGoogle,
-                          style: TextStyle(fontSize: 16, color: Colors.white),
-                        ),
+                        label: Text(loc.signInGoogle,
+                            style: TextStyle(fontSize: 16, color: Colors.white)),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF1E1E1E),
+                          backgroundColor: Color(0xFF425B78), // bleu-gris doux mais marqué
                           padding: EdgeInsets.symmetric(horizontal: 50.0, vertical: 12.0),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                         ),
                       ),
-                      SizedBox(height: 30.0),
+                      SizedBox(height: 30),
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -320,8 +284,11 @@ class _SignInScreenState extends State<SignInScreen> {
       {bool isPassword = false}) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        color: Colors.white.withOpacity(0.9),
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 5, offset: Offset(0, 2)),
+        ],
       ),
       child: TextField(
         controller: controller,
@@ -329,10 +296,12 @@ class _SignInScreenState extends State<SignInScreen> {
         decoration: InputDecoration(
           hintText: hintText,
           border: InputBorder.none,
-          prefixIcon: Icon(icon),
+          prefixIcon: Icon(icon, color: Colors.black),
           suffixIcon: isPassword
               ? IconButton(
-            icon: Icon(_isPasswordVisible ? Icons.visibility : Icons.visibility_off),
+            icon: Icon(
+                _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                color: Colors.black),
             onPressed: () {
               setState(() {
                 _isPasswordVisible = !_isPasswordVisible;
