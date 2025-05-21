@@ -40,7 +40,7 @@ class _StylishStatsScreenState extends State<StylishStatsScreen> {
       if (sexe == 'Femme') f++;
 
       if (emploi == 'Étudiant') e++;
-      if (emploi == 'Employé') emp++;
+      if (emploi == 'employee') emp++;
       if (emploi == 'Autres') c++;
     }
     for (var doc in evalSnapshot.docs) {
