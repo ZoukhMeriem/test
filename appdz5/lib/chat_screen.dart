@@ -29,30 +29,49 @@ class _ChatScreenState extends State<ChatScreen> {
     final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: gradientColors.first,
-        title: Text(
-          loc.discussionsDesLignes,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : Colors.black87,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              _isAscending ? Icons.arrow_downward : Icons.arrow_upward,
-              color: isDark ? Colors.white70 : Color(0x8C000000),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: AppBar(
+          automaticallyImplyLeading: false,
+          elevation: 0,
+          backgroundColor: Colors.transparent, // pour voir le dégradé
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFFF0F4F8),
+                  Color(0xFFD1D9E6) ,
+                  Color(0xFFA3BED8),
+                ],
+              ),
             ),
-            onPressed: () {
-              setState(() {
-                _isAscending = !_isAscending;
-              });
-            },
-          )
-        ],
+          ),
+          title: Text(
+            loc.discussionsDesLignes,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : Colors.black87,
+            ),
+          ),
+          actions: [
+            IconButton(
+              icon: Icon(
+                _isAscending ? Icons.arrow_downward : Icons.arrow_upward,
+                color: isDark ? Colors.white70 : Color(0x8C000000),
+              ),
+              onPressed: () {
+                setState(() {
+                  _isAscending = !_isAscending;
+                });
+              },
+            )
+          ],
+        ),
       ),
+
       backgroundColor: isDark ? Colors.black : Color(0xCBE9EBF3),
       body: Column(
         children: [
@@ -91,10 +110,11 @@ class _ChatScreenState extends State<ChatScreen> {
             });
           },
           style: OutlinedButton.styleFrom(
-            backgroundColor:
-            isSelected ? Color(0xFFAFD6B3) : Theme.of(context).cardColor,
+            backgroundColor: isSelected ? Color(0xFF7986CB) :
+            Theme.of(context).cardColor,
+
             foregroundColor: isSelected
-                ? Colors.black87
+                ? Colors.white
                 : isDark
                 ? Colors.white70
                 : Theme.of(context).textTheme.bodyMedium?.color,
