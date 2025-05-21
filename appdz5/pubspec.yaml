@@ -93,6 +93,7 @@ flutter:
     - assets/fonts/Montserrat/static/Montserrat-Regular.ttf
     - assets/fonts/Montserrat/static/Montserrat-Bold.ttf
     - assets/images/train_on_map.png
+    -assets/images/train_icon.png
 
   fonts:
     - family: Montserrat
