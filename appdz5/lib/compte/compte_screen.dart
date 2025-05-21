@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // NE PAS OUBLIER !
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Ne pas oublier la localisation
 import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
 import 'user_info_page.dart';
@@ -34,11 +34,15 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _isDark = false;
 
   final Color primaryColor = const Color(0xFF1E1E1E);
+
+
   final List<Color> gradientColors = [
-    Color(0x998BB1FF),
-    Color(0xFFF4D9DE),
-    Color(0xFFDDD7E8),
+    Color(0xFFA3BED8),
+    Color(0xFFD1D9E6) ,
+
   ];
+
+  final Color iconColor = Colors.black;
 
   @override
   void initState() {
@@ -120,6 +124,8 @@ class _ProfilePageState extends State<ProfilePage> {
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: AppBar(
           automaticallyImplyLeading: false,
+          elevation: 0,
+          backgroundColor: Colors.transparent, // Important pour le dégradé
           flexibleSpace: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -129,17 +135,9 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
           ),
-          elevation: 0,
-          centerTitle: true,
-          title: Text(
-            local.myAccount,
-            style: TextStyle(
-              color: isDark ? Colors.white : primaryColor,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
         ),
       ),
+
       body: Column(
         children: [
           _buildHeader(isDark, local),
@@ -172,7 +170,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     }
                   }, isDark),
                   SwitchListTile(
-                    title: Text(local.darkMode, style: TextStyle(color: isDark ? Colors.white : Colors.black)),
+                    title: Text(local.darkMode,
+                        style: TextStyle(color: isDark ? Colors.white : Colors.black)),
                     value: _isDark,
                     onChanged: (value) {
                       setState(() {
@@ -180,7 +179,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       });
                       toggleTheme(value);
                     },
-                    secondary: Icon(Icons.dark_mode, color: isDark ? Colors.white : primaryColor),
+                    secondary: Icon(Icons.dark_mode, color: iconColor),
                   ),
                   _buildListTile(Icons.settings, local.settings, () {
                     if (userData != null && userData!['username'] != null) {
@@ -297,7 +296,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildListTile(IconData icon, String title, VoidCallback onTap, bool isDark) {
     return ListTile(
-      leading: Icon(icon, color: isDark ? Colors.white : primaryColor),
+      leading: Icon(icon, color: iconColor),
       title: Text(
         title,
         style: TextStyle(
